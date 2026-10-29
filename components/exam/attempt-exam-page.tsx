@@ -1,47 +1,180 @@
-import Link from 'next/link';
-import { AlertTriangle, ArrowRight, CheckCircle2, Clock3, FileText, ShieldCheck } from 'lucide-react';
-import { getExamBySlug } from '@/lib/exam';
+'use client';
 
-export function ExamInstructionsPage({ slug }: { slug: string }) {
-  const exam = getExamBySlug(slug) || { title: 'Exam', duration: 120, totalQuestions: 100, highlights: ['Mock prep', 'Auto-save'] };
+import { useEffect, useMemo, useState } from 'react';
+import { ArrowLeft, ArrowRight, Clock3, Flag, Save, ShieldCheck } from 'lucide-react';
+import Link from 'next/link';
+import { getQuestionsForExam } from '@/lib/exam';
+
+const EXAM_ID = 'ssc-cgl-practice';
+
+export function AttemptExamPage({ slug }: { slug: string }) {
+  const questions = useMemo(() => getQuestionsForExam(slug || EXAM_ID), [slug]);
+  const [selectedAnswers, setSelectedAnswers] = useState<Record<string, number>>({});
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [timeLeft, setTimeLeft] = useState(120 * 60);
+  const [isSaved, setIsSaved] = useState(false);
+  const [language, setLanguage] = useState<'en' | 'hi'>('en');
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setTimeLeft((prev) => {
+        if (prev <= 1) {
+          clearInterval(timer);
+          handleAutoSubmit();
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, []);
+
+  useEffect(() => {
+    const saved = localStorage.getItem(`rajtest-exam-${slug}`);
+    if (saved) {
+      setSelectedAnswers(JSON.parse(saved));
+    }
+  }, [slug]);
+
+  useEffect(() => {
+    localStorage.setItem(`rajtest-exam-${slug}`, JSON.stringify(selectedAnswers));
+    setIsSaved(true);
+    const t = setTimeout(() => setIsSaved(false), 1200);
+    return () => clearTimeout(t);
+  }, [selectedAnswers, slug]);
+
+  const question = questions[currentIndex];
+  const formattedTime = `${String(Math.floor(timeLeft / 60)).padStart(2, '0')}:${String(timeLeft % 60).padStart(2, '0')}`;
+
+  const handleNext = () => setCurrentIndex((prev) => Math.min(prev + 1, questions.length - 1));
+  const handlePrev = () => setCurrentIndex((prev) => Math.max(prev - 1, 0));
+
+  const handleAutoSubmit = async () => {
+    try {
+      const res = await fetch('/api/submit-exam', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          examId: slug,
+          studentId: 'stu-1024',
+          answers: selectedAnswers,
+          submittedAt: new Date().toISOString(),
+        }),
+      });
+      const data = await res.json();
+      if (data.ok) {
+        window.location.href = `/results/${slug}`;
+      }
+    } catch (error) {
+      console.error('Auto submit failed', error);
+    }
+  };
+
+  const handleSubmit = async () => {
+    await handleAutoSubmit();
+  };
+
+  if (!question) {
+    return <div className="container-shell py-12 text-center text-slate-600">No questions found.</div>;
+  }
 
   return (
-    <div className="container-shell py-14">
-      <div className="mx-auto max-w-4xl card p-8 md:p-10">
-        <div className="flex items-center justify-between gap-3">
+    <div className="container-shell py-8">
+      <div className="mb-6 flex flex-col gap-4 rounded-2xl border border-slate-200 bg-white p-4 shadow-soft md:flex-row md:items-center md:justify-between">
+        <div className="flex items-center gap-4">
+          <Link href={`/exam/${slug}/instructions`} className="rounded-full border border-slate-200 p-2 text-slate-600">
+            <ArrowLeft className="h-4 w-4" />
+          </Link>
           <div>
-            <p className="text-sm font-semibold uppercase tracking-[0.2em] text-primary-600">Instructions</p>
-            <h1 className="mt-2 text-3xl font-extrabold text-slate-900 md:text-4xl">{exam.title}</h1>
+            <div className="text-sm uppercase tracking-[0.2em] text-slate-500">SSC CGL Mock</div>
+            <div className="text-xl font-bold text-slate-900">Question {currentIndex + 1}/{questions.length}</div>
           </div>
-          <div className="rounded-full bg-primary-50 px-4 py-2 text-sm font-semibold text-primary-700">{exam.totalQuestions} Questions</div>
         </div>
 
-        <div className="mt-8 grid gap-4 md:grid-cols-3">
-          <div className="rounded-2xl bg-slate-50 p-4"><Clock3 className="h-5 w-5 text-primary-600" /><div className="mt-3 text-lg font-bold">{exam.duration} mins</div><div className="text-sm text-slate-600">Total duration</div></div>
-          <div className="rounded-2xl bg-slate-50 p-4"><FileText className="h-5 w-5 text-primary-600" /><div className="mt-3 text-lg font-bold">1 Mark each</div><div className="text-sm text-slate-600">Question pattern</div></div>
-          <div className="rounded-2xl bg-slate-50 p-4"><ShieldCheck className="h-5 w-5 text-primary-600" /><div className="mt-3 text-lg font-bold">Auto submit</div><div className="text-sm text-slate-600">At timeout</div></div>
+        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 rounded-full bg-slate-100 px-3 py-2 text-sm font-semibold text-slate-700">
+            <Clock3 className="h-4 w-4 text-primary-600" /> {formattedTime}
+          </div>
+          <div className="flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-700">
+            <Save className="h-4 w-4 text-emerald-600" /> {isSaved ? 'Saved' : 'Auto-save'}
+          </div>
+          <button onClick={handleSubmit} className="rounded-full bg-primary-600 px-4 py-2 text-sm font-semibold text-white">Submit</button>
+        </div>
+      </div>
+
+      <div className="grid gap-6 lg:grid-cols-[1.3fr_0.7fr]">
+        <div className="card p-6 md:p-8">
+          <div className="mb-5 flex items-center justify-between">
+            <div className="flex items-center gap-2 text-sm font-semibold text-primary-600">
+              <Flag className="h-4 w-4" /> Question {currentIndex + 1}
+            </div>
+            <div className="flex gap-2 rounded-full border border-slate-200 bg-slate-50 p-1 text-xs font-semibold text-slate-600">
+              <button onClick={() => setLanguage('en')} className={`rounded-full px-2 py-1 ${language === 'en' ? 'bg-white text-slate-900 shadow-sm' : ''}`}>
+                EN
+              </button>
+              <button onClick={() => setLanguage('hi')} className={`rounded-full px-2 py-1 ${language === 'hi' ? 'bg-white text-slate-900 shadow-sm' : ''}`}>
+                HI
+              </button>
+            </div>
+          </div>
+
+          <h2 className="text-lg font-semibold leading-8 text-slate-800 md:text-2xl">
+            {language === 'en' ? question.text : question.hindiText}
+          </h2>
+
+          <div className="mt-8 space-y-4">
+            {question.options.map((option, index) => {
+              const selected = selectedAnswers[question.id] === index;
+              return (
+                <button
+                  key={option}
+                  onClick={() => setSelectedAnswers((prev) => ({ ...prev, [question.id]: index }))}
+                  className={`w-full rounded-2xl border p-4 text-left transition ${selected ? 'border-primary-500 bg-primary-50 text-primary-800 shadow-sm' : 'border-slate-200 bg-slate-50 text-slate-700 hover:border-primary-200'}`}
+                >
+                  <div className="flex items-center gap-3">
+                    <span className={`flex h-7 w-7 items-center justify-center rounded-full text-sm font-bold ${selected ? 'bg-primary-600 text-white' : 'bg-white text-slate-600'}`}>
+                      {String.fromCharCode(65 + index)}
+                    </span>
+                    <span>{option}</span>
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+
+          <div className="mt-8 flex items-center justify-between">
+            <button onClick={handlePrev} className="rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 disabled:cursor-not-allowed disabled:opacity-50" disabled={currentIndex === 0}>
+              Previous
+            </button>
+            <button onClick={handleNext} className="inline-flex items-center gap-2 rounded-full bg-primary-600 px-4 py-2 text-sm font-semibold text-white">
+              Next <ArrowRight className="h-4 w-4" />
+            </button>
+          </div>
         </div>
 
-        <div className="mt-10 space-y-4 text-slate-700">
-          <div className="flex gap-3"><CheckCircle2 className="mt-0.5 h-5 w-5 text-emerald-500" /><span>Read each question carefully before choosing the best option.</span></div>
-          <div className="flex gap-3"><CheckCircle2 className="mt-0.5 h-5 w-5 text-emerald-500" /><span>Questions can be skipped and revisited using the navigation panel.</span></div>
-          <div className="flex gap-3"><CheckCircle2 className="mt-0.5 h-5 w-5 text-emerald-500" /><span>Your progress is saved automatically every few seconds.</span></div>
-          <div className="flex gap-3"><CheckCircle2 className="mt-0.5 h-5 w-5 text-emerald-500" /><span>On timeout, the exam is submitted automatically and scored on server.</span></div>
-        </div>
-
-        <div className="mt-10 rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800">
-          <div className="flex items-center gap-2 font-semibold"><AlertTriangle className="h-4 w-4" /> Important</div>
-          <p className="mt-2">Once you begin, you cannot refresh or reopen the exam. Ensure uninterrupted internet access.</p>
-        </div>
-
-        <div className="mt-10 flex flex-col justify-between gap-3 sm:flex-row">
-          <Link href="/exams" className="inline-flex items-center justify-center rounded-full border border-slate-200 bg-white px-5 py-3 font-semibold text-slate-700">
-            Go back
-          </Link>
-          <Link href={`/exam/${slug}/attempt`} className="inline-flex items-center justify-center gap-2 rounded-full bg-primary-600 px-5 py-3 font-semibold text-white">
-            Start exam <ArrowRight className="h-4 w-4" />
-          </Link>
-        </div>
+        <aside className="card p-5">
+          <div className="mb-4 flex items-center justify-between">
+            <h3 className="text-lg font-bold text-slate-900">Question navigator</h3>
+            <ShieldCheck className="h-5 w-5 text-emerald-500" />
+          </div>
+          <div className="grid grid-cols-5 gap-2">
+            {questions.map((item, index) => (
+              <button
+                key={item.id}
+                onClick={() => setCurrentIndex(index)}
+                className={`flex h-10 items-center justify-center rounded-xl text-sm font-semibold ${index === currentIndex ? 'bg-primary-600 text-white' : selectedAnswers[item.id] !== undefined ? 'bg-emerald-50 text-emerald-700' : 'bg-slate-100 text-slate-600'}`}
+              >
+                {index + 1}
+              </button>
+            ))}
+          </div>
+          <div className="mt-6 rounded-2xl bg-slate-50 p-4">
+            <div className="text-sm text-slate-500">Answered</div>
+            <div className="mt-2 text-3xl font-black text-slate-900">{Object.keys(selectedAnswers).length}</div>
+            <div className="mt-2 text-xs text-slate-500">of {questions.length} questions</div>
+          </div>
+        </aside>
       </div>
     </div>
   );

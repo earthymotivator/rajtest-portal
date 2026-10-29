@@ -2,12 +2,12 @@ import Link from 'next/link';
 import { Activity, ArrowRight, BarChart3, CheckCircle2, Clock3 } from 'lucide-react';
 import { dashboardResults } from '@/lib/mock-data';
 
-export function DashboardPage() {
+export function ResultReviewPage() {
   return (
     <div className="container-shell py-14">
       <div className="mb-8 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
         <div>
-          <p className="text-sm font-semibold uppercase tracking-[0.2em] text-primary-600">Dashboard</p>
+          <p className="text-sm font-semibold uppercase tracking-[0.2em] text-primary-600">Results</p>
           <h1 className="mt-2 text-4xl font-extrabold text-slate-900">Student performance</h1>
         </div>
         <Link href="/exams" className="inline-flex items-center gap-2 rounded-full bg-primary-600 px-4 py-2 text-sm font-semibold text-white">

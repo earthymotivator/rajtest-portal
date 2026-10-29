@@ -1,5 +1,5 @@
-import { ExamInstructionsPage } from '@/components/exam/exam-instructions-page';
+import { AttemptExamPage } from '@/components/exam/attempt-exam-page';
 
 export default function Page({ params }: { params: { slug: string } }) {
-  return <ExamInstructionsPage slug={params.slug} />;
+  return <AttemptExamPage slug={params.slug} />;
 }
