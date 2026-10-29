@@ -1,37 +1,102 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { calculateScore, getQuestionsForExam, validateSubmission } from '@/lib/exam';
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-export async function POST(request: NextRequest) {
-  try {
-    const payload = await request.json();
-    const validation = validateSubmission(payload);
+:root {
+  color-scheme: light;
+  --surface: #f8fafc;
+  --card: #ffffff;
+  --primary: #4c69f0;
+  --primary-dark: #3149d4;
+  --text: #0f172a;
+  --muted: #475569;
+}
 
-    if (!validation.ok) {
-      return NextResponse.json({ ok: false, error: validation.error }, { status: 400 });
-    }
+html {
+  scroll-behavior: smooth;
+}
 
-    const examSlug = payload.examId;
-    const questions = getQuestionsForExam(examSlug);
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: var(--surface);
+  color: var(--text);
+  font-family: Arial, Helvetica, sans-serif;
+  line-height: 1.5;
+}
 
-    if (!questions.length) {
-      return NextResponse.json({ ok: false, error: 'Exam not found.' }, { status: 404 });
-    }
+* {
+  box-sizing: border-box;
+}
 
-    const result = calculateScore(questions, payload.answers);
-    const passMark = Math.ceil(questions.length * 0.4);
-
-    return NextResponse.json({
-      ok: true,
-      examId: examSlug,
-      studentId: payload.studentId,
-      score: result.score,
-      correct: result.correct,
-      attempted: result.attempted,
-      total: questions.length,
-      status: result.correct >= passMark ? 'pass' : 'fail',
-      submittedAt: new Date().toISOString(),
-    });
-  } catch (error) {
-    return NextResponse.json({ ok: false, error: 'Unexpected server error.' }, { status: 500 });
+@layer components {
+  .container-shell {
+    @apply mx-auto max-w-7xl px-4 sm:px-6 lg:px-8;
   }
 }
+
+button,
+a {
+  -webkit-tap-highlight-color: transparent;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+}
+
+::selection {
+  background: rgba(76, 105, 240, 0.2);
+}
+
+@media (min-width: 1536px) {
+  .container-shell {
+    max-width: 1400px;
+  }
+}
+
+@media (max-width: 640px) {
+  html {
+    font-size: 14px;
+  }
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  letter-spacing: -0.02em;
+}
+
+p {
+  margin: 0;
+}
+
+button {
+  cursor: pointer;
+}
+
+body {
+  background-image: radial-gradient(circle at top, rgba(76, 105, 240, 0.12), transparent 32%);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+
+
+
+																																																																																																																																																																																																																																																																																																																																																																																		

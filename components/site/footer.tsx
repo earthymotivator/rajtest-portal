@@ -1,25 +1,26 @@
 import Link from 'next/link';
-import { Bell, ChevronDown, Search } from 'lucide-react';
+import { Bell, ChevronDown, Menu, Search } from 'lucide-react';
 
 const navItems = [
   { name: 'Home', href: '/' },
   { name: 'Exams', href: '/exams' },
   { name: 'Results', href: '/results/ssc-cgl-practice' },
   { name: 'Study Material', href: '/dashboard' },
-  { name: 'Admin', href: '/admin' },
+  { name: 'Latest News', href: '/exams' },
+  { name: 'Contact', href: '/' },
 ];
 
 export function Header() {
   return (
-    <header className="sticky top-0 z-40 border-b border-slate-200 bg-white/80 backdrop-blur-md">
+    <header className="sticky top-0 z-40 border-b border-slate-200 bg-white/90 backdrop-blur-md">
       <div className="container-shell flex items-center justify-between gap-4 py-4">
-        <Link href="/" className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary-600 text-lg font-bold text-white shadow-md">
+        <Link href="/" className="flex items-center gap-3" aria-label="RajTest home page">
+          <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-orange-500 to-red-600 text-lg font-black text-white shadow-lg shadow-orange-500/20">
             R
           </div>
           <div>
-            <div className="text-lg font-extrabold tracking-tight text-slate-900">RajTest</div>
-            <div className="text-[10px] font-semibold uppercase tracking-[0.2em] text-slate-500">Portal</div>
+            <div className="text-[1.7rem] font-black leading-none tracking-tight text-slate-900">RajTest</div>
+            <div className="text-[10px] font-bold uppercase tracking-[0.28em] text-slate-500">.in</div>
           </div>
         </Link>
 
@@ -32,20 +33,24 @@ export function Header() {
         </nav>
 
         <div className="hidden items-center gap-3 lg:flex">
-          <div className="flex items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-600">
-            <Search className="h-4 w-4" />
-            Search exams
+          <div className="hidden items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-500 xl:flex">
+            <Search className="h-4 w-4 text-slate-400" />
+            <span>Search exam</span>
           </div>
-          <button className="rounded-full border border-slate-200 p-2 text-slate-600">
+          <button className="rounded-full border border-slate-200 p-2 text-slate-600 transition hover:bg-slate-50" aria-label="Notifications">
             <Bell className="h-4 w-4" />
           </button>
-          <button className="rounded-full bg-primary-600 px-4 py-2 text-sm font-semibold text-white shadow-md shadow-primary-600/20">
+          <button className="rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition hover:border-primary-200 hover:text-primary-600">
             Login
+          </button>
+          <button className="rounded-full bg-primary-600 px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-primary-600/20 transition hover:bg-primary-700">
+            Register
           </button>
         </div>
 
-        <button className="flex items-center gap-2 rounded-full border border-slate-200 px-3 py-2 text-sm font-medium text-slate-700 lg:hidden">
-          Menu <ChevronDown className="h-4 w-4" />
+        <button className="flex items-center gap-2 rounded-full border border-slate-200 px-3 py-2 text-sm font-medium text-slate-700 lg:hidden" aria-label="Open menu">
+          <Menu className="h-4 w-4" />
+          <ChevronDown className="h-4 w-4" />
         </button>
       </div>
     </header>

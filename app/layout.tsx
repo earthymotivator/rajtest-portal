@@ -1,17 +1,33 @@
+import './globals.css';
 import type { Metadata } from 'next';
+import { Inter } from 'next/font/google';
+import { Header } from '@/components/site/header';
+import { Footer } from '@/components/site/footer';
+import { cn } from '@/lib/utils';
+
+const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
   title: {
-    default: 'RajTest Portal | Competitive Exam Preparation',
-    template: '%s | RajTest Portal',
+    default: 'RajTest.in | Competitive Exam Prep',
+    template: '%s | RajTest.in',
   },
   description:
-    'Prepare for competitive exams with mock tests, results, analysis, and live exam experience.',
-  keywords: ['competitive exams', 'test series', 'mock tests', 'SSC', 'Railway', 'Banking'],
-  openGraph: {
-    title: 'RajTest Portal',
-    description: 'Competitive exam portal for preparation, analysis, and performance tracking.',
-    type: 'website',
-  },
+    'Online mock tests, exam analysis, and study resources for SSC, Banking, Railway, and other competitive exams.',
+  keywords: ['competitive exams', 'SSC', 'banking', 'railway', 'mock tests'],
   metadataBase: new URL('https://rajtest.in'),
 };
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <html lang="en" suppressHydrationWarning>
+      <body className={cn(inter.className, 'bg-slate-50 text-slate-900 antialiased')}>
+        <div className="min-h-screen bg-[radial-gradient(circle_at_top,_rgba(76,105,240,0.10),_transparent_30%)]">
+          <Header />
+          <main>{children}</main>
+          <Footer />
+        </div>
+      </body>
+    </html>
+  );
+}
