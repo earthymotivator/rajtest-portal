@@ -69,6 +69,190 @@ img {
   animation-play-state: paused;
 }
 
+.catalogue-row-scroll {
+  display: flex;
+  gap: 12px;
+  margin-inline: -11px;
+  overflow-x: auto;
+  padding: 2px 11px 8px;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+.catalogue-row-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.catalogue-row-item {
+  display: flex;
+  flex: 0 0 84%;
+  min-width: 0;
+  scroll-snap-align: start;
+}
+
+.test-card {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid #ece9e2;
+  background: #fff;
+}
+
+.test-cover {
+  position: relative;
+  display: flex;
+  min-height: 132px;
+  align-items: flex-end;
+  padding: 12px 14px;
+  color: #fff;
+  background: linear-gradient(145deg, #7d1015, #b83a25 55%, #d7a43a);
+}
+
+.test-cover[data-tone="1"] { background: linear-gradient(145deg, #101f5b, #24408c 55%, #4a7bbf); }
+.test-cover[data-tone="2"] { background: linear-gradient(145deg, #14532d, #2c7a41 55%, #7c9c2b); }
+.test-cover[data-tone="3"] { background: linear-gradient(145deg, #55103f, #8d245c 55%, #c25c78); }
+.test-cover[data-tone="4"] { background: linear-gradient(145deg, #0b4145, #106b72 55%, #3a9d95); }
+.test-cover[data-tone="5"] { background: linear-gradient(145deg, #7a2e0b, #b0521a 55%, #d99a3a); }
+.test-cover[data-tone="6"] { background: linear-gradient(145deg, #2e1065, #55219f 55%, #8e63cf); }
+.test-cover[data-tone="7"] { background: linear-gradient(145deg, #402711, #77501f 55%, #b1883c); }
+
+.test-cover::after {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 82% 18%, #ffffff47, transparent 34%);
+  content: "";
+  pointer-events: none;
+}
+
+.test-cover-text {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  min-width: 0;
+}
+
+.test-cover-head {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 7px;
+  margin-bottom: 5px;
+}
+
+.test-cover-when {
+  min-width: 0;
+  overflow: hidden;
+  color: #ffffffeb;
+  font-size: 10px;
+  font-weight: 800;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.test-cover-new,
+.test-cover-kind {
+  flex: none;
+  background: #ffffffeb;
+  padding: 3px 8px;
+  color: #9a4a12;
+  font-size: 10px;
+  font-weight: 900;
+  line-height: 1.2;
+}
+
+.test-cover-kind {
+  margin-left: auto;
+}
+
+.test-cover-title {
+  display: -webkit-box;
+  min-height: 43px;
+  margin: 0 0 2px;
+  overflow: hidden;
+  font-size: 16px;
+  font-weight: 800;
+  line-height: 1.35;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.test-cover-category {
+  display: -webkit-box;
+  overflow: hidden;
+  font-size: 11px;
+  opacity: 0.92;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+}
+
+.test-card-body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 9px;
+  padding: 12px 13px;
+}
+
+.test-card-exams {
+  display: -webkit-box;
+  min-height: 34px;
+  overflow: hidden;
+  color: #676e7e;
+  font-size: 11px;
+  line-height: 1.4;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.test-stats {
+  display: flex;
+  min-height: 46px;
+  align-content: flex-start;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.test-stats .badge {
+  border: 1px solid #ece9e2;
+  background: #fffdfa;
+  padding: 3px 6px;
+  color: #676e7e;
+  font-size: 10px;
+  line-height: 1.35;
+}
+
+.test-stats .badge-blue {
+  background: #eff6ff;
+  color: #1d4ed8;
+}
+
+.test-card-go {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: auto;
+  border-top: 1px solid #f1eee8;
+  padding-top: 9px;
+}
+
+.test-start-link {
+  display: inline-flex;
+  min-height: 32px;
+  align-items: center;
+  justify-content: center;
+  background: #1a7f45;
+  padding: 0 14px;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.test-start-link:hover {
+  background: #14532d;
+}
+
 @keyframes rajtest-marquee {
   to { transform: translateX(-50%); }
 }
@@ -76,6 +260,18 @@ img {
 @media (min-width: 1536px) {
   .container-shell {
     max-width: 1400px;
+  }
+}
+
+@media (min-width: 700px) {
+  .catalogue-row-item {
+    flex-basis: 44%;
+  }
+}
+
+@media (min-width: 1000px) {
+  .catalogue-row-item {
+    flex-basis: 31%;
   }
 }
 

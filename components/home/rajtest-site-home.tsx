@@ -6,7 +6,6 @@ import {
   ArrowRight,
   Bell,
   BookOpen,
-  CalendarDays,
   CheckCircle2,
   ChevronDown,
   Clock3,
@@ -15,7 +14,6 @@ import {
   ListFilter,
   Medal,
   Trophy,
-  Users,
   X,
 } from 'lucide-react';
 import {
@@ -97,6 +95,39 @@ function formatCountdown(milliseconds: number) {
   const minutes = Math.floor((totalSeconds % 3600) / 60);
   const seconds = totalSeconds % 60;
   return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+}
+
+function HomepageTestCard({ test, index }: { test: (typeof homepageTests)[number]; index: number }) {
+  return (
+    <article className="test-card">
+      <div className="test-cover" data-tone={(index % 7) + 1}>
+        <div className="test-cover-text">
+          <div className="test-cover-head">
+            {test.isNew && <span className="test-cover-new">NEW</span>}
+            <span className="test-cover-when">🗓 {test.publishedAt}</span>
+            <span className="test-cover-kind">Free Test</span>
+          </div>
+          <h4 className="test-cover-title" lang="hi">{test.title}</h4>
+          <p className="test-cover-category">{test.subject}</p>
+        </div>
+      </div>
+      <div className="test-card-body">
+        <p className="test-card-exams">{test.examTags.join(' · ')}</p>
+        <div className="test-stats">
+          <span className="badge">{test.questionCount} Questions</span>
+          <span className="badge">{test.duration} Mins</span>
+          <span className="badge">{test.marks} Marks</span>
+          <span className="badge">👥 {test.attempts}</span>
+          {test.difficulty && <span className="badge badge-blue">{test.difficulty}</span>}
+        </div>
+        <div className="test-card-go">
+          <Link href={`/exam/${test.slug}/instructions`} className="test-start-link">
+            Start<span className="sr-only"> — {test.title}</span>
+          </Link>
+        </div>
+      </div>
+    </article>
+  );
 }
 
 export function HomePage() {
@@ -320,32 +351,11 @@ export function HomePage() {
                     </button>
                   )}
                 </div>
-                <div className="grid gap-2 lg:grid-cols-2">
-                  {visibleTests.map((test) => (
-                    <article key={`${group.title}-${test.id}`} className="border border-[#ece9e2] bg-white p-3 transition hover:border-[#bfe3c8]">
-                      <div className="flex items-start justify-between gap-3">
-                        <div className="min-w-0">
-                          <div className="flex flex-wrap items-center gap-2 text-[10px] font-semibold text-[#676e7e]">
-                            <span className="inline-flex items-center gap-1"><CalendarDays className="h-3 w-3" />{test.publishedAt}</span>
-                            <span className="bg-[#fff5e6] px-1.5 py-0.5 text-[#9a4a12]">Free Test</span>
-                            {test.isNew && <span className="bg-[#ffe6c9] px-1.5 py-0.5 text-[#9a4a12]">NEW</span>}
-                          </div>
-                          <h4 className="mt-2 text-sm font-bold text-[#231300]">{test.title}</h4>
-                          <p className="mt-1 text-[11px] font-semibold text-[#1a7f45]">{test.subject}</p>
-                        </div>
-                        {test.difficulty && <span className="shrink-0 border border-[#ece9e2] px-2 py-1 text-[10px] font-semibold text-[#676e7e]">{test.difficulty}</span>}
-                      </div>
-                      <p className="mt-2 line-clamp-1 text-[10px] text-[#676e7e]">{test.examTags.join(' · ')}</p>
-                      <div className="mt-3 flex flex-wrap items-center justify-between gap-2 border-t border-[#f1eee8] pt-2">
-                        <div className="flex flex-wrap gap-x-3 gap-y-1 text-[10px] text-[#676e7e]">
-                          <span>{test.questionCount} Questions</span>
-                          <span>{test.duration} Mins</span>
-                          <span>{test.marks} Marks</span>
-                          <span className="inline-flex items-center gap-1"><Users className="h-3 w-3" />{test.attempts}</span>
-                        </div>
-                        <Link href={`/exam/${test.slug}/instructions`} className="inline-flex min-h-8 items-center gap-1 bg-[#1a7f45] px-3 text-xs font-bold text-white hover:bg-[#14532d]">Start <ArrowRight className="h-3.5 w-3.5" /></Link>
-                      </div>
-                    </article>
+                <div className="catalogue-row-scroll">
+                  {visibleTests.map((test, index) => (
+                    <div className="catalogue-row-item" key={`${group.title}-${test.id}`}>
+                      <HomepageTestCard test={test} index={index} />
+                    </div>
                   ))}
                 </div>
               </section>
