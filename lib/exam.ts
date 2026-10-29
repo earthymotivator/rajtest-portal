@@ -1,11 +1,33 @@
-import { examQuestions, exams, type Exam, type Question } from '@/lib/mock-data';
+import { examQuestions, exams, homepageTests, type Exam, type Question } from '@/lib/mock-data';
 
 export function getExamBySlug(slug: string): Exam | undefined {
-  return exams.find((exam) => exam.slug === slug || exam.id === slug);
+  const exam = exams.find((item) => item.slug === slug || item.id === slug);
+  if (exam) return exam;
+
+  const feedTest = homepageTests.find((item) => item.slug === slug || item.id === slug);
+  if (!feedTest) return undefined;
+
+  return {
+    id: feedTest.id,
+    slug: feedTest.slug,
+    title: feedTest.title,
+    category: feedTest.subject,
+    duration: feedTest.duration,
+    totalQuestions: feedTest.questionCount,
+    difficulty: feedTest.difficulty ?? 'Medium',
+    level: feedTest.examTags.join(', '),
+    status: 'Live',
+    attempts: feedTest.attempts,
+    price: 0,
+    description: `${feedTest.subject} के लिए हिंदी में मुफ़्त अभ्यास टेस्ट।`,
+    icon: '📝',
+    highlights: ['समयबद्ध टेस्ट', 'तुरंत परिणाम', 'उत्तर समीक्षा'],
+    syllabus: [feedTest.subject],
+  };
 }
 
 export function getQuestionsForExam(slug: string): Question[] {
-  return examQuestions[slug] || [];
+  return examQuestions[slug] || (homepageTests.some((test) => test.slug === slug || test.id === slug) ? examQuestions['rajtest-pyq-12'] ?? [] : []);
 }
 
 export function validateSubmission(payload: unknown) {

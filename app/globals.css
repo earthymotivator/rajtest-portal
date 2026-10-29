@@ -4,13 +4,16 @@
 
 :root {
   color-scheme: light;
-  --surface: #fbfbf8;
+  --surface: #ffffff;
   --card: #ffffff;
-  --ink: #17302c;
-  --saffron: #c64f2c;
-  --saffron-dark: #a63e20;
-  --text: #17302c;
-  --muted: #5b6864;
+  --ink: #231300;
+  --saffron: #9a4a12;
+  --saffron-dark: #6b4500;
+  --brand-green: #1a7f45;
+  --brand-green-soft: #bfe3c8;
+  --cream: #fff5e6;
+  --text: #231300;
+  --muted: #676e7e;
 }
 
 html {
@@ -22,7 +25,7 @@ body {
   min-height: 100vh;
   background: var(--surface);
   color: var(--text);
-  font-family: "Noto Sans Devanagari", "Mukta", "Mangal", sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", "Noto Sans", Arial, sans-serif;
   line-height: 1.5;
 }
 
@@ -55,7 +58,19 @@ img {
 }
 
 ::selection {
-  background: rgba(198, 79, 44, 0.2);
+  background: rgba(26, 127, 69, 0.18);
+}
+
+.rajtest-leader-track {
+  animation: rajtest-marquee 52s linear infinite;
+}
+
+.rajtest-leader-track:hover {
+  animation-play-state: paused;
+}
+
+@keyframes rajtest-marquee {
+  to { transform: translateX(-50%); }
 }
 
 @media (min-width: 1536px) {
@@ -82,6 +97,10 @@ button {
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .rajtest-leader-track {
+    animation: none;
+  }
+
   * {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;

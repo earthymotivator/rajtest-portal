@@ -39,6 +39,21 @@ export type StudentResult = {
   percentile: number;
 };
 
+export type HomepageTest = {
+  id: string;
+  slug: string;
+  title: string;
+  subject: string;
+  examTags: string[];
+  publishedAt: string;
+  questionCount: number;
+  duration: number;
+  marks: number;
+  attempts: number;
+  difficulty?: Difficulty;
+  isNew?: boolean;
+};
+
 export const examCategories = [
   { slug: 'rpsc', title: 'RPSC', description: 'RAS, School Lecturer, SI', icon: '🏛️' },
   { slug: 'cet', title: 'CET', description: 'Graduation और Senior Secondary', icon: '📝' },
@@ -46,6 +61,140 @@ export const examCategories = [
   { slug: 'patwar', title: 'Patwar', description: 'राजस्थान पटवारी भर्ती', icon: '🗺️' },
   { slug: 'police', title: 'Police', description: 'Constable और SI भर्ती', icon: '🛡️' },
   { slug: 'rajasthan-gk', title: 'Rajasthan GK', description: 'इतिहास, भूगोल और संस्कृति', icon: '🌄' },
+];
+
+const cetTargets = ['CET (12th Based)', 'CET (Graduation Based)'];
+const broadTargets = [...cetTargets, 'REET', 'Patwari', 'Rajasthan Police', 'SSC CGL', 'IBPS', 'RRB NTPC', 'RAS'];
+
+function createHomepageTests(
+  slugPrefix: string,
+  subject: string,
+  titles: string[],
+  examTags: string[],
+  publishedAt: string,
+  questionCount = 10,
+  duration = 10,
+): HomepageTest[] {
+  return titles.map((title, index) => ({
+    id: `${slugPrefix}-${index + 1}`,
+    slug: `${slugPrefix}-${index + 1}`,
+    title,
+    subject,
+    examTags,
+    publishedAt,
+    questionCount,
+    duration,
+    marks: questionCount,
+    attempts: 5 + index * 7,
+    difficulty: index % 3 === 0 ? 'Medium' : 'Easy',
+  }));
+}
+
+const newHomepageTests: HomepageTest[] = [
+  {
+    id: 'reasoning-math-29-oct', slug: 'reasoning-math-29-oct',
+    title: '🧠 दोपहर का रीजनिंग + गणित — 29 अक्टूबर', subject: 'Reasoning',
+    examTags: cetTargets, publishedAt: '29 Oct 2026', questionCount: 10, duration: 10,
+    marks: 10, attempts: 7, difficulty: 'Easy', isNew: true,
+  },
+  {
+    id: 'rajtest-pyq-12-feed', slug: 'rajtest-pyq-12',
+    title: 'RajTest PYQ #12', subject: 'Rajasthan GK',
+    examTags: [...cetTargets, 'RAS'], publishedAt: '29 Oct 2026', questionCount: 20,
+    duration: 10, marks: 20, attempts: 33, difficulty: 'Medium', isNew: true,
+  },
+  {
+    id: 'rajtest-pyq-11-feed', slug: 'rajtest-pyq-11',
+    title: 'RajTest PYQ #11', subject: 'Rajasthan GK',
+    examTags: [...cetTargets, 'RAS'], publishedAt: '28 Oct 2026', questionCount: 20,
+    duration: 10, marks: 20, attempts: 13, difficulty: 'Easy', isNew: true,
+  },
+  {
+    id: 'daily-hard-30-feed', slug: 'daily-hard-30',
+    title: '🎯 Daily #30 — 27 अक्टूबर के 10 सबसे कठिन प्रश्न', subject: 'General Knowledge',
+    examTags: cetTargets, publishedAt: '27 Oct 2026', questionCount: 10, duration: 10,
+    marks: 10, attempts: 5, isNew: true,
+  },
+  {
+    id: 'evening-geography-29-feed', slug: 'evening-geography-29',
+    title: '🗺️ शाम का भूगोल · संविधान · विज्ञान — 29 अक्टूबर', subject: 'Geography',
+    examTags: cetTargets, publishedAt: '29 Oct 2026', questionCount: 10, duration: 10,
+    marks: 10, attempts: 7, isNew: true,
+  },
+  {
+    id: 'afternoon-reasoning-27-feed', slug: 'afternoon-reasoning-27',
+    title: '🧠 दोपहर का रीजनिंग + गणित — 27 अक्टूबर', subject: 'Reasoning',
+    examTags: cetTargets, publishedAt: '27 Oct 2026', questionCount: 10, duration: 10,
+    marks: 10, attempts: 1, isNew: true,
+  },
+  {
+    id: 'gk-marathon-2-feed', slug: 'gk-marathon-day-2',
+    title: 'General Knowledge Marathon Series Day 2', subject: 'General Knowledge',
+    examTags: broadTargets, publishedAt: '27 Oct 2026', questionCount: 20, duration: 10,
+    marks: 20, attempts: 6, difficulty: 'Hard', isNew: true,
+  },
+  {
+    id: 'rajtest-pyq-10-feed', slug: 'rajtest-pyq-10',
+    title: 'RajTest PYQ #10', subject: 'Rajasthan GK',
+    examTags: [...cetTargets, 'RAS'], publishedAt: '27 Oct 2026', questionCount: 20,
+    duration: 10, marks: 20, attempts: 4, difficulty: 'Medium', isNew: true,
+  },
+  {
+    id: 'morning-rajasthan-gk-27-feed', slug: 'morning-rajasthan-gk-27',
+    title: '☀️ सुबह का राजस्थान GK — 27 अक्टूबर', subject: 'Rajasthan GK',
+    examTags: cetTargets, publishedAt: '27 Oct 2026', questionCount: 10, duration: 10,
+    marks: 10, attempts: 6, isNew: true,
+  },
+  {
+    id: 'daily-hard-29-feed', slug: 'daily-hard-29',
+    title: '🎯 Daily #29 — 26 अक्टूबर के 10 सबसे कठिन प्रश्न', subject: 'General Knowledge',
+    examTags: cetTargets, publishedAt: '26 Oct 2026', questionCount: 10, duration: 10,
+    marks: 10, attempts: 11, difficulty: 'Medium', isNew: true,
+  },
+];
+
+export const homepageTests: HomepageTest[] = [
+  ...newHomepageTests,
+  ...createHomepageTests('rajtest-pyq', 'Rajasthan GK', [
+    'RajTest PYQ #9', 'RajTest PYQ #8', 'RajTest PYQ #7', 'RajTest PYQ #6',
+    'RajTest PYQ #5', 'RajTest PYQ #4', 'RajTest PYQ #3',
+  ], [...cetTargets, 'RAS'], '26 Oct 2026', 20),
+  ...createHomepageTests('english-vocab', 'General English', [
+    'Daily Vocab Quiz 23rd Oct', 'Daily Vocabulary Quiz 22nd Oct',
+    'Daily Vocabulary Quiz 21st Oct', 'Daily Vocabulary Quiz 19th Oct',
+    'Degrees Of Adjectives',
+  ], broadTargets, '23 Oct 2026', 10, 5),
+  ...createHomepageTests('current-affairs', 'Current Affairs', [
+    'Daily Current Affairs Quiz 23rd Oct', 'Daily Current Affairs Quiz',
+    "Today's Current Affairs Quiz 21st Oct", 'Daily Current Affairs Quiz 19th Oct',
+  ], broadTargets, '23 Oct 2026', 10, 5),
+  ...createHomepageTests('general-awareness', 'General Awareness', [
+    'General Awareness', 'General Awareness Quiz 14th Oct',
+    'General Awareness Quiz 13th Oct', 'General Awareness Practice Set',
+  ], broadTargets, '16 Oct 2026'),
+  ...createHomepageTests('maths-pyq', 'Maths', [
+    'Maths Marathon Series Day 1', 'NUMBER SYSTEM PYQ SET-2',
+    'NUMBER SYSTEM PYQ SET-1', 'Maths PYQ', 'त्रिभुज', 'Trigonometry PYQ',
+    'Data Interpretation In Hindi', 'HCF LCM PYQ', 'Algebra', 'Number Series',
+  ], cetTargets, '23 Oct 2026', 20),
+  ...createHomepageTests('general-science', 'General Science', [
+    'General Science PYQ', 'मानव रोग एवं रोगजनक', 'पोषण एवं विटामिन',
+    'Agriculture, Horticulture & Forestry (Rajasthan)',
+    'Medical Specialists — कौन सा Doctor किस रोग का इलाज करता है?',
+    'Cardiopulmonary Resuscitation (CPR)', 'भारत का अंतरिक्ष अनुसंधान कार्यक्रम',
+    'प्रकाश का परावर्तन — गोलीय दर्पण एवं वर्ण-विक्षेपण',
+    'मानव स्वास्थ्य — रोग एवं रक्त समूह', 'मानव स्वास्थ्य — ABO प्रणाली',
+  ], broadTargets, '16 Oct 2026'),
+];
+
+export const homepageTestGroups = [
+  { title: 'New Tests', count: 10, isNew: true, slugs: newHomepageTests.map((test) => test.slug) },
+  { title: 'Rajasthan GK', count: 62, slugs: ['rajtest-pyq-12', 'rajtest-pyq-11', 'rajtest-pyq-10', ...homepageTests.filter((test) => test.id.startsWith('rajtest-pyq-')).map((test) => test.slug)] },
+  { title: 'General English', count: 61, slugs: homepageTests.filter((test) => test.subject === 'General English').map((test) => test.slug) },
+  { title: 'Current Affairs', count: 52, slugs: homepageTests.filter((test) => test.subject === 'Current Affairs').map((test) => test.slug) },
+  { title: 'General Awareness', count: 43, slugs: homepageTests.filter((test) => test.subject === 'General Awareness').map((test) => test.slug) },
+  { title: 'Maths', count: 44, slugs: homepageTests.filter((test) => test.subject === 'Maths').map((test) => test.slug) },
+  { title: 'General Science', count: 39, slugs: homepageTests.filter((test) => test.subject === 'General Science').map((test) => test.slug) },
 ];
 
 export const exams: Exam[] = [
@@ -278,7 +427,12 @@ export const leaderboardEntries = [
   { rank: '02', name: 'MewarLearner', score: '64%', color: 'bg-slate-100 text-slate-700' },
   { rank: '03', name: 'AravalliAce', score: '63%', color: 'bg-orange-100 text-orange-800' },
   { rank: '04', name: 'JaipurScholar', score: '60%', color: 'bg-white text-slate-700' },
-  { rank: '05', name: 'MarwarPrep', score: '51%', color: 'bg-white text-slate-700' },
+  { rank: '05', name: 'MarwarPrep', score: '55%', color: 'bg-white text-slate-700' },
+  { rank: '06', name: 'DesertAspirant', score: '42%', color: 'bg-white text-slate-700' },
+  { rank: '07', name: 'PinkCityLearner', score: '38%', color: 'bg-white text-slate-700' },
+  { rank: '08', name: 'BikanerBooks', score: '33%', color: 'bg-white text-slate-700' },
+  { rank: '09', name: 'HadautiPrep', score: '29%', color: 'bg-white text-slate-700' },
+  { rank: '10', name: 'ShekhawatiStudy', score: '28%', color: 'bg-white text-slate-700' },
 ];
 
 export const adminStats = [
