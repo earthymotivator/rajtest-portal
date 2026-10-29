@@ -1,5 +1,6 @@
-import { ExamInstructionsPage } from '@/components/exam/exam-instructions-page';
+import { ExamInstructionsPage } from '@/components/exam/attempt-exam-page';
 
-export default function Page({ params }: { params: { slug: string } }) {
-  return <ExamInstructionsPage slug={params.slug} />;
+export default async function Page({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
+  return <ExamInstructionsPage slug={slug} />;
 }

@@ -1,5 +1,6 @@
-import { ResultReviewPage } from '@/components/results/result-review-page';
+import { ResultReviewPage } from '@/components/admin/admin-page';
 
-export default function Page() {
-  return <ResultReviewPage />;
+export default async function Page({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+  return <ResultReviewPage examId={id} />;
 }

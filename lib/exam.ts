@@ -1,19 +1,20 @@
 import { examQuestions, exams, type Exam, type Question } from '@/lib/mock-data';
 
 export function getExamBySlug(slug: string): Exam | undefined {
-  return exams.find((exam) => exam.slug === slug);
+  return exams.find((exam) => exam.slug === slug || exam.id === slug);
 }
 
 export function getQuestionsForExam(slug: string): Question[] {
-  return examQuestions[slug] ?? [];
+  return examQuestions[slug] || [];
 }
 
-export function validateSubmission(payload: any) {
-  if (!payload || typeof payload !== 'object') return { ok: false, error: 'Invalid payload.' };
-  if (!payload.examId || typeof payload.examId !== 'string') return { ok: false, error: 'Exam id is required.' };
-  if (!payload.answers || typeof payload.answers !== 'object') return { ok: false, error: 'Answers are required.' };
-  if (!payload.studentId || typeof payload.studentId !== 'string') return { ok: false, error: 'Student id is required.' };
-  return { ok: true };
+export function validateSubmission(payload: unknown) {
+  if (!payload || typeof payload !== 'object' || Array.isArray(payload)) return { ok: false, error: 'Invalid payload.' };
+  const submission = payload as Record<string, unknown>;
+  if (typeof submission.examId !== 'string' || !submission.examId) return { ok: false, error: 'Exam id is required.' };
+  if (!submission.answers || typeof submission.answers !== 'object' || Array.isArray(submission.answers)) return { ok: false, error: 'Answers are required.' };
+  if (typeof submission.studentId !== 'string' || !submission.studentId) return { ok: false, error: 'Student id is required.' };
+  return { ok: true as const };
 }
 
 export function calculateScore(questions: Question[], answers: Record<string, number | string | null>) {

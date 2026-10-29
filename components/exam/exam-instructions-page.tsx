@@ -1,52 +1,53 @@
 import Link from 'next/link';
-import { AlertTriangle, ArrowRight, CheckCircle2, Clock3, FileText, ShieldCheck } from 'lucide-react';
-import { getExamBySlug } from '@/lib/exam';
+import { ArrowRight, Clock3, Gauge, Star } from 'lucide-react';
+import { examCategories, exams } from '@/lib/mock-data';
 
-export function ExamInstructionsPage({ slug }: { slug: string }) {
-  const exam = getExamBySlug(slug) || {
-    title: 'Exam',
-    duration: 120,
-    totalQuestions: 100,
-    highlights: ['Mock prep', 'Auto-save'],
-  };
+export function ExamListingPage({ slug }: { slug: string }) {
+  const category = examCategories.find((item) => item.slug === slug);
+  const filtered = category ? exams.filter((exam) => exam.category.toLowerCase() === category.title.toLowerCase()) : [];
+  const title = category?.title ?? 'परीक्षा';
 
   return (
     <div className="container-shell py-14">
-      <div className="mx-auto max-w-4xl card p-8 md:p-10">
-        <div className="flex items-center justify-between gap-3">
-          <div>
-            <p className="text-sm font-semibold uppercase tracking-[0.2em] text-primary-600">Instructions</p>
-            <h1 className="mt-2 text-3xl font-extrabold text-slate-900 md:text-4xl">{exam.title}</h1>
+      <div className="mb-8 flex items-center justify-between gap-3">
+        <div>
+          <p className="text-sm font-semibold text-primary-600">राजस्थान भर्ती परीक्षा</p>
+          <h1 className="mt-2 text-3xl font-extrabold text-slate-900">{title} के टेस्ट</h1>
+        </div>
+        <Link href="/exams" className="text-sm font-semibold text-primary-600">← सभी परीक्षाएँ</Link>
+      </div>
+
+      <div className="grid gap-6 lg:grid-cols-2">
+        {filtered.length ? filtered.map((exam) => (
+          <div key={exam.id} className="card overflow-hidden">
+            <div className="flex items-center justify-between bg-slate-50 p-5">
+              <div className="flex items-center gap-3">
+                <div className="flex h-12 w-12 items-center justify-center rounded-sm bg-white text-2xl shadow-sm">{exam.icon}</div>
+                <div>
+                  <div className="text-xs font-semibold text-slate-500">{exam.category}</div>
+                  <div className="text-xl font-bold text-slate-900">{exam.title}</div>
+                </div>
+              </div>
+              <span className="rounded-sm bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-700">मुफ़्त</span>
+            </div>
+            <div className="p-5">
+              <p className="text-sm text-slate-600">{exam.description}</p>
+              <div className="mt-5 grid grid-cols-3 gap-3 text-center text-sm">
+                <div className="rounded-sm bg-slate-50 p-3"><Clock3 className="mx-auto h-4 w-4 text-primary-600" /><div className="mt-2 font-bold">{exam.duration} मिनट</div></div>
+                <div className="rounded-sm bg-slate-50 p-3"><Gauge className="mx-auto h-4 w-4 text-primary-600" /><div className="mt-2 font-bold">{exam.totalQuestions} प्रश्न</div></div>
+                <div className="rounded-sm bg-slate-50 p-3"><Star className="mx-auto h-4 w-4 text-primary-600" /><div className="mt-2 font-bold">{exam.attempts.toLocaleString('hi-IN')} प्रयास</div></div>
+              </div>
+              <div className="mt-6 flex items-center justify-between">
+                <div className="text-sm font-semibold text-emerald-700">पूरी तरह मुफ़्त</div>
+                <Link href={`/exam/${exam.slug}/instructions`} className="inline-flex items-center gap-2 rounded-sm bg-primary-600 px-4 py-2 text-sm font-semibold text-white">
+                  टेस्ट शुरू करें <ArrowRight className="h-4 w-4" />
+                </Link>
+              </div>
+            </div>
           </div>
-          <div className="rounded-full bg-primary-50 px-4 py-2 text-sm font-semibold text-primary-700">{exam.totalQuestions} Questions</div>
-        </div>
-
-        <div className="mt-8 grid gap-4 md:grid-cols-3">
-          <div className="rounded-2xl bg-slate-50 p-4"><Clock3 className="h-5 w-5 text-primary-600" /><div className="mt-3 text-lg font-bold">{exam.duration} mins</div><div className="text-sm text-slate-600">Total time</div></div>
-          <div className="rounded-2xl bg-slate-50 p-4"><FileText className="h-5 w-5 text-primary-600" /><div className="mt-3 text-lg font-bold">1 Mark each</div><div className="text-sm text-slate-600">Question type</div></div>
-          <div className="rounded-2xl bg-slate-50 p-4"><ShieldCheck className="h-5 w-5 text-primary-600" /><div className="mt-3 text-lg font-bold">Auto submit</div><div className="text-sm text-slate-600">At timeout</div></div>
-        </div>
-
-        <div className="mt-10 space-y-4 text-slate-700">
-          <div className="flex gap-3"><CheckCircle2 className="mt-0.5 h-5 w-5 text-emerald-500" /><span>Read each question carefully before choosing the best option.</span></div>
-          <div className="flex gap-3"><CheckCircle2 className="mt-0.5 h-5 w-5 text-emerald-500" /><span>Questions can be skipped and revisited using the navigation panel.</span></div>
-          <div className="flex gap-3"><CheckCircle2 className="mt-0.5 h-5 w-5 text-emerald-500" /><span>Your progress is saved automatically every few seconds.</span></div>
-          <div className="flex gap-3"><CheckCircle2 className="mt-0.5 h-5 w-5 text-emerald-500" /><span>On timeout, the exam is submitted automatically and scored on server.</span></div>
-        </div>
-
-        <div className="mt-10 rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800">
-          <div className="flex items-center gap-2 font-semibold"><AlertTriangle className="h-4 w-4" /> Important</div>
-          <p className="mt-2">Once you begin, you cannot refresh or reopen the exam. Ensure uninterrupted internet access.</p>
-        </div>
-
-        <div className="mt-10 flex flex-col justify-between gap-3 sm:flex-row">
-          <Link href="/exams" className="inline-flex items-center justify-center rounded-full border border-slate-200 bg-white px-5 py-3 font-semibold text-slate-700">
-            Go back
-          </Link>
-          <Link href={`/exam/${slug}/attempt`} className="inline-flex items-center justify-center gap-2 rounded-full bg-primary-600 px-5 py-3 font-semibold text-white">
-            Start exam <ArrowRight className="h-4 w-4" />
-          </Link>
-        </div>
+        )) : (
+          <div className="card p-8 text-slate-600">इस परीक्षा के टेस्ट जल्द उपलब्ध होंगे।</div>
+        )}
       </div>
     </div>
   );

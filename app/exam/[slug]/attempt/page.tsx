@@ -1,5 +1,6 @@
-import { AttemptExamPage } from '@/components/exam/attempt-exam-page';
+import { AttemptExamPage } from '@/components/dashboard/dashboard-page';
 
-export default function Page({ params }: { params: { slug: string } }) {
-  return <AttemptExamPage slug={params.slug} />;
+export default async function Page({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
+  return <AttemptExamPage key={slug} slug={slug} />;
 }

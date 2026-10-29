@@ -4,12 +4,13 @@
 
 :root {
   color-scheme: light;
-  --surface: #f8fafc;
+  --surface: #fbfbf8;
   --card: #ffffff;
-  --primary: #4c69f0;
-  --primary-dark: #3149d4;
-  --text: #0f172a;
-  --muted: #475569;
+  --ink: #17302c;
+  --saffron: #c64f2c;
+  --saffron-dark: #a63e20;
+  --text: #17302c;
+  --muted: #5b6864;
 }
 
 html {
@@ -21,7 +22,7 @@ body {
   min-height: 100vh;
   background: var(--surface);
   color: var(--text);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: "Noto Sans Devanagari", "Mukta", "Mangal", sans-serif;
   line-height: 1.5;
 }
 
@@ -32,6 +33,14 @@ body {
 @layer components {
   .container-shell {
     @apply mx-auto max-w-7xl px-4 sm:px-6 lg:px-8;
+  }
+
+  .card {
+    @apply border border-slate-200 bg-white shadow-sm;
+  }
+
+  .pill {
+    @apply inline-flex items-center gap-2 rounded-sm px-3 py-1.5 text-xs font-semibold;
   }
 }
 
@@ -46,18 +55,12 @@ img {
 }
 
 ::selection {
-  background: rgba(76, 105, 240, 0.2);
+  background: rgba(198, 79, 44, 0.2);
 }
 
 @media (min-width: 1536px) {
   .container-shell {
     max-width: 1400px;
-  }
-}
-
-@media (max-width: 640px) {
-  html {
-    font-size: 14px;
   }
 }
 
@@ -76,10 +79,6 @@ p {
 
 button {
   cursor: pointer;
-}
-
-body {
-  background-image: radial-gradient(circle at top, rgba(76, 105, 240, 0.12), transparent 32%);
 }
 
 @media (prefers-reduced-motion: reduce) {

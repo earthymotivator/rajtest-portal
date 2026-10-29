@@ -1,5 +1,5 @@
-import { ResultReviewPage } from '@/components/results/result-review-page';
+import { AdminPage } from '@/components/admin/admin-page';
 
-export default function Page({ params }: { params: { id: string } }) {
-  return <ResultReviewPage examId={params.id} />;
+export default function Page() {
+  return <AdminPage />;
 }

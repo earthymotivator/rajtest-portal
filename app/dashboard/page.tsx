@@ -1,4 +1,4 @@
-import { DashboardPage } from '@/components/dashboard/dashboard-page';
+import { DashboardPage } from '@/components/results/result-review-page';
 
 export default function Page() {
   return <DashboardPage />;

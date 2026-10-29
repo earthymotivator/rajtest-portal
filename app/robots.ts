@@ -1,5 +1,8 @@
-import { AdminPage } from '@/components/admin/admin-page';
+import type { MetadataRoute } from 'next';
 
-export default function Page() {
-  return <AdminPage />;
+export default function robots(): MetadataRoute.Robots {
+  return {
+    rules: { userAgent: '*', allow: '/' },
+    sitemap: 'https://rajtest.in/sitemap.xml',
+  };
 }

@@ -1,57 +1,52 @@
 import Link from 'next/link';
-import { Bell, ChevronDown, Menu, Search } from 'lucide-react';
+import { ArrowRight, Menu } from 'lucide-react';
 
 const navItems = [
-  { name: 'Home', href: '/' },
-  { name: 'Exams', href: '/exams' },
-  { name: 'Results', href: '/results/ssc-cgl-practice' },
-  { name: 'Study Material', href: '/dashboard' },
-  { name: 'Latest News', href: '/exams' },
-  { name: 'Contact', href: '/' },
+  { name: 'टेस्ट', href: '/#today-tests' },
+  { name: 'परीक्षाएँ', href: '/exams' },
+  { name: 'लीडरबोर्ड', href: '/leaderboard' },
+  { name: 'मेरी तैयारी', href: '/dashboard' },
 ];
 
 export function Header() {
   return (
-    <header className="sticky top-0 z-40 border-b border-slate-200 bg-white/90 backdrop-blur-md">
-      <div className="container-shell flex items-center justify-between gap-4 py-4">
-        <Link href="/" className="flex items-center gap-3" aria-label="RajTest home page">
-          <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-orange-500 to-red-600 text-lg font-black text-white shadow-lg shadow-orange-500/20">
-            R
-          </div>
-          <div>
-            <div className="text-[1.7rem] font-black leading-none tracking-tight text-slate-900">RajTest</div>
-            <div className="text-[10px] font-bold uppercase tracking-[0.28em] text-slate-500">.in</div>
-          </div>
+    <header className="sticky top-0 z-40 border-b border-slate-200 bg-white">
+      <div className="border-b border-white/10 bg-[var(--ink)] text-white">
+        <div className="container-shell flex min-h-8 items-center justify-between gap-3 text-xs">
+          <p>राजस्थान सरकारी परीक्षाओं की तैयारी अब रोज़ाना</p>
+          <Link href="/exams" className="hidden items-center gap-1 font-semibold text-orange-200 sm:inline-flex">फ्री टेस्ट शुरू करें <ArrowRight className="h-3.5 w-3.5" /></Link>
+        </div>
+      </div>
+      <div className="container-shell flex min-h-[72px] items-center justify-between gap-4">
+        <Link href="/" className="flex shrink-0 items-center gap-3" aria-label="RajTest.in होम">
+          <span className="flex h-10 w-10 items-center justify-center rounded-sm bg-[var(--saffron)] text-lg font-black text-white">R</span>
+          <span>
+            <span className="block text-xl font-extrabold leading-5 text-[var(--ink)]">RajTest.in</span>
+            <span className="mt-1 block text-[11px] text-slate-500">राज टेस्ट सीरीज़</span>
+          </span>
         </Link>
 
-        <nav className="hidden items-center gap-7 text-sm font-medium text-slate-700 lg:flex">
-          {navItems.map((item) => (
-            <Link key={item.name} href={item.href} className="transition hover:text-primary-600">
-              {item.name}
-            </Link>
-          ))}
+        <nav className="hidden items-center gap-7 text-sm font-semibold text-slate-700 lg:flex" aria-label="मुख्य नेविगेशन">
+          {navItems.map((item) => <Link key={item.name} href={item.href} className="transition hover:text-[var(--saffron)]">{item.name}</Link>)}
         </nav>
 
         <div className="hidden items-center gap-3 lg:flex">
-          <div className="hidden items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-500 xl:flex">
-            <Search className="h-4 w-4 text-slate-400" />
-            <span>Search exam</span>
-          </div>
-          <button className="rounded-full border border-slate-200 p-2 text-slate-600 transition hover:bg-slate-50" aria-label="Notifications">
-            <Bell className="h-4 w-4" />
-          </button>
-          <button className="rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition hover:border-primary-200 hover:text-primary-600">
-            Login
-          </button>
-          <button className="rounded-full bg-primary-600 px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-primary-600/20 transition hover:bg-primary-700">
-            Register
-          </button>
+          <Link href="/dashboard" className="text-sm font-semibold text-[var(--ink)]">प्रोफ़ाइल</Link>
+          <Link href="/exams" className="inline-flex min-h-10 items-center gap-2 rounded-sm bg-[var(--saffron)] px-4 text-sm font-bold text-white transition hover:bg-[var(--saffron-dark)]">
+            मुफ़्त शुरुआत <ArrowRight className="h-4 w-4" />
+          </Link>
         </div>
 
-        <button className="flex items-center gap-2 rounded-full border border-slate-200 px-3 py-2 text-sm font-medium text-slate-700 lg:hidden" aria-label="Open menu">
-          <Menu className="h-4 w-4" />
-          <ChevronDown className="h-4 w-4" />
-        </button>
+        <details className="relative lg:hidden">
+          <summary className="flex h-10 w-10 cursor-pointer list-none items-center justify-center rounded-sm border border-slate-300 text-[var(--ink)]" aria-label="नेविगेशन खोलें" title="मेन्यू">
+            <Menu className="h-5 w-5" />
+          </summary>
+          <nav className="absolute right-0 top-12 z-50 flex w-56 flex-col border border-slate-200 bg-white p-2 shadow-lg" aria-label="मोबाइल नेविगेशन">
+            {navItems.map((item) => <Link key={item.name} href={item.href} className="px-3 py-3 text-sm font-semibold text-[var(--ink)] hover:bg-orange-50">{item.name}</Link>)}
+            <Link href="/dashboard" className="px-3 py-3 text-sm font-semibold text-[var(--ink)] hover:bg-orange-50">प्रोफ़ाइल</Link>
+            <Link href="/exams" className="mt-1 flex items-center justify-between bg-[var(--saffron)] px-3 py-3 text-sm font-bold text-white">मुफ़्त शुरुआत <ArrowRight className="h-4 w-4" /></Link>
+          </nav>
+        </details>
       </div>
     </header>
   );

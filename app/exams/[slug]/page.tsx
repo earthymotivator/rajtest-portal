@@ -1,5 +1,6 @@
-import { ExamCategoryPage } from '@/components/exams/exam-category-page';
+import { ExamListingPage } from '@/components/exam/exam-instructions-page';
 
-export default function Page() {
-  return <ExamCategoryPage />;
+export default async function Page({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
+  return <ExamListingPage slug={slug} />;
 }

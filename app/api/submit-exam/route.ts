@@ -31,7 +31,7 @@ export async function POST(request: NextRequest) {
       status: result.correct >= passMark ? 'pass' : 'fail',
       submittedAt: new Date().toISOString(),
     });
-  } catch (error) {
+  } catch {
     return NextResponse.json({ ok: false, error: 'Unexpected server error.' }, { status: 500 });
   }
 }

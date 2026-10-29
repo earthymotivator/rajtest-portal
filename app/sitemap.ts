@@ -1,11 +1,9 @@
 import type { MetadataRoute } from 'next';
 
-export default function robots(): MetadataRoute.Robots {
-  return {
-    rules: {
-      userAgent: '*',
-      allow: '/',
-    },
-    sitemap: 'https://rajtest.in/sitemap.xml',
-  };
+export default function sitemap(): MetadataRoute.Sitemap {
+  return [
+    { url: 'https://rajtest.in/', lastModified: new Date() },
+    { url: 'https://rajtest.in/exams', lastModified: new Date() },
+    { url: 'https://rajtest.in/leaderboard', lastModified: new Date() },
+  ];
 }
