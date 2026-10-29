@@ -1,11 +1,11 @@
-import { examQuestions, type Exam, type Question } from '@/lib/mock-data';
+import { examQuestions, exams, type Exam, type Question } from '@/lib/mock-data';
 
 export function getExamBySlug(slug: string): Exam | undefined {
-  return examQuestions ? undefined : undefined;
+  return exams.find((exam) => exam.slug === slug);
 }
 
 export function getQuestionsForExam(slug: string): Question[] {
-  return (require('@/lib/mock-data').examQuestions as Record<string, Question[]>)[slug] || [];
+  return examQuestions[slug] ?? [];
 }
 
 export function validateSubmission(payload: any) {

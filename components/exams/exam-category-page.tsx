@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { ArrowRight, BookOpen, GraduationCap, LayoutGrid, ShieldCheck, Sparkles, TimerReset } from 'lucide-react';
 import { examCategories, exams } from '@/lib/mock-data';
 
-export function HomePage() {
+export function ExamCategoryPage() {
   return (
     <div>
       <section className="container-shell pb-12 pt-10 md:pb-16 md:pt-14">
@@ -19,16 +19,10 @@ export function HomePage() {
               Practice with live mock tests, real-time analytics, detailed review, and curriculum-based preparation.
             </p>
             <div className="mt-8 flex flex-wrap items-center gap-4">
-              <Link
-                href="/exams"
-                className="inline-flex items-center gap-2 rounded-full bg-primary-600 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-primary-600/20"
-              >
+              <Link href="/exams" className="inline-flex items-center gap-2 rounded-full bg-primary-600 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-primary-600/20">
                 Explore Exams <ArrowRight className="h-4 w-4" />
               </Link>
-              <Link
-                href="/dashboard"
-                className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-6 py-3 text-sm font-semibold text-slate-700"
-              >
+              <Link href="/dashboard" className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-6 py-3 text-sm font-semibold text-slate-700">
                 Student Dashboard
               </Link>
             </div>
@@ -90,7 +84,7 @@ export function HomePage() {
         <div className="flex items-end justify-between gap-3">
           <div>
             <p className="text-sm font-semibold uppercase tracking-[0.2em] text-primary-600">Top categories</p>
-            <h2 className="section-title mt-2">Explore exam categories</h2>
+            <h2 className="mt-2 text-3xl font-extrabold tracking-tight text-slate-900 md:text-4xl">Explore exam categories</h2>
           </div>
           <Link href="/exams" className="hidden text-sm font-semibold text-primary-600 md:inline-flex">
             View all categories →
@@ -118,7 +112,7 @@ export function HomePage() {
 
       <section className="bg-slate-900 py-14 text-white">
         <div className="container-shell">
-          <div className="flex items-end justify-between gap-4"> 
+          <div className="flex items-end justify-between gap-4">
             <div>
               <p className="text-sm font-semibold uppercase tracking-[0.2em] text-primary-200">Why aspirants choose us</p>
               <h2 className="mt-2 text-3xl font-extrabold md:text-4xl">Everything needed to perform better</h2>
@@ -127,7 +121,7 @@ export function HomePage() {
           <div className="mt-8 grid gap-5 md:grid-cols-2 xl:grid-cols-4">
             {[
               { icon: LayoutGrid, title: 'Curated mock tests', text: 'Exam-style tests mapped to real syllabi.' },
-              { icon: Goal, title: 'Instant review', text: 'Get solution explanations and detailed insights.' },
+              { icon: ShieldCheck, title: 'Instant review', text: 'Get solution explanations and detailed insights.' },
               { icon: ShieldCheck, title: 'Performance tracking', text: 'Monitor growth with percentile analytics.' },
               { icon: GraduationCap, title: 'Focused learning', text: 'Strengthen concepts and fill knowledge gaps.' },
             ].map(({ icon: Icon, title, text }) => (
@@ -147,7 +141,7 @@ export function HomePage() {
         <div className="flex items-end justify-between gap-3">
           <div>
             <p className="text-sm font-semibold uppercase tracking-[0.2em] text-primary-600">Popular tests</p>
-            <h2 className="section-title mt-2">Trending mock exams</h2>
+            <h2 className="mt-2 text-3xl font-extrabold tracking-tight text-slate-900 md:text-4xl">Trending mock exams</h2>
           </div>
           <Link href="/exams" className="hidden text-sm font-semibold text-primary-600 md:inline-flex">
             View all tests →
@@ -196,8 +190,4 @@ export function HomePage() {
       </section>
     </div>
   );
-}
-
-function Goal(props: any) {
-  return <svg {...props} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2v20" /><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7H14.5a3.5 3.5 0 0 1 0 7H6" /></svg>;
 }

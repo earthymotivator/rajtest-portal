@@ -1,5 +1,5 @@
-import { AttemptExamPage } from '@/components/exam/attempt-exam-page';
+import { DashboardPage } from '@/components/dashboard/dashboard-page';
 
-export default function Page({ params }: { params: { slug: string } }) {
-  return <AttemptExamPage slug={params.slug} />;
+export default function Page() {
+  return <DashboardPage />;
 }
