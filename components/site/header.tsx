@@ -1,102 +1,58 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+import Link from 'next/link';
+import { Bell, ChevronDown, Menu, Search } from 'lucide-react';
 
-:root {
-  color-scheme: light;
-  --surface: #f8fafc;
-  --card: #ffffff;
-  --primary: #4c69f0;
-  --primary-dark: #3149d4;
-  --text: #0f172a;
-  --muted: #475569;
+const navItems = [
+  { name: 'Home', href: '/' },
+  { name: 'Exams', href: '/exams' },
+  { name: 'Results', href: '/results/ssc-cgl-practice' },
+  { name: 'Study Material', href: '/dashboard' },
+  { name: 'Latest News', href: '/exams' },
+  { name: 'Contact', href: '/' },
+];
+
+export function Header() {
+  return (
+    <header className="sticky top-0 z-40 border-b border-slate-200 bg-white/90 backdrop-blur-md">
+      <div className="container-shell flex items-center justify-between gap-4 py-4">
+        <Link href="/" className="flex items-center gap-3" aria-label="RajTest home page">
+          <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-orange-500 to-red-600 text-lg font-black text-white shadow-lg shadow-orange-500/20">
+            R
+          </div>
+          <div>
+            <div className="text-[1.7rem] font-black leading-none tracking-tight text-slate-900">RajTest</div>
+            <div className="text-[10px] font-bold uppercase tracking-[0.28em] text-slate-500">.in</div>
+          </div>
+        </Link>
+
+        <nav className="hidden items-center gap-7 text-sm font-medium text-slate-700 lg:flex">
+          {navItems.map((item) => (
+            <Link key={item.name} href={item.href} className="transition hover:text-primary-600">
+              {item.name}
+            </Link>
+          ))}
+        </nav>
+
+        <div className="hidden items-center gap-3 lg:flex">
+          <div className="hidden items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-500 xl:flex">
+            <Search className="h-4 w-4 text-slate-400" />
+            <span>Search exam</span>
+          </div>
+          <button className="rounded-full border border-slate-200 p-2 text-slate-600 transition hover:bg-slate-50" aria-label="Notifications">
+            <Bell className="h-4 w-4" />
+          </button>
+          <button className="rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition hover:border-primary-200 hover:text-primary-600">
+            Login
+          </button>
+          <button className="rounded-full bg-primary-600 px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-primary-600/20 transition hover:bg-primary-700">
+            Register
+          </button>
+        </div>
+
+        <button className="flex items-center gap-2 rounded-full border border-slate-200 px-3 py-2 text-sm font-medium text-slate-700 lg:hidden" aria-label="Open menu">
+          <Menu className="h-4 w-4" />
+          <ChevronDown className="h-4 w-4" />
+        </button>
+      </div>
+    </header>
+  );
 }
-
-html {
-  scroll-behavior: smooth;
-}
-
-body {
-  margin: 0;
-  min-height: 100vh;
-  background: var(--surface);
-  color: var(--text);
-  font-family: Arial, Helvetica, sans-serif;
-  line-height: 1.5;
-}
-
-* {
-  box-sizing: border-box;
-}
-
-@layer components {
-  .container-shell {
-    @apply mx-auto max-w-7xl px-4 sm:px-6 lg:px-8;
-  }
-}
-
-button,
-a {
-  -webkit-tap-highlight-color: transparent;
-}
-
-img {
-  display: block;
-  max-width: 100%;
-}
-
-::selection {
-  background: rgba(76, 105, 240, 0.2);
-}
-
-@media (min-width: 1536px) {
-  .container-shell {
-    max-width: 1400px;
-  }
-}
-
-@media (max-width: 640px) {
-  html {
-    font-size: 14px;
-  }
-}
-
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
-  letter-spacing: -0.02em;
-}
-
-p {
-  margin: 0;
-}
-
-button {
-  cursor: pointer;
-}
-
-body {
-  background-image: radial-gradient(circle at top, rgba(76, 105, 240, 0.12), transparent 32%);
-}
-
-@media (prefers-reduced-motion: reduce) {
-  * {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-    scroll-behavior: auto !important;
-  }
-}
-
-@layer utilities {
-  .text-balance {
-    text-wrap: balance;
-  }
-}
-
-
-
-																																																																																																																																																																																																																																																																																																																																																																																		

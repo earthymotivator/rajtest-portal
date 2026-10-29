@@ -1,58 +1,50 @@
-import Link from 'next/link';
-import { Bell, ChevronDown, Menu, Search } from 'lucide-react';
-
-const navItems = [
-  { name: 'Home', href: '/' },
-  { name: 'Exams', href: '/exams' },
-  { name: 'Results', href: '/results/ssc-cgl-practice' },
-  { name: 'Study Material', href: '/dashboard' },
-  { name: 'Latest News', href: '/exams' },
-  { name: 'Contact', href: '/' },
-];
-
-export function Header() {
+export function Footer() {
   return (
-    <header className="sticky top-0 z-40 border-b border-slate-200 bg-white/90 backdrop-blur-md">
-      <div className="container-shell flex items-center justify-between gap-4 py-4">
-        <Link href="/" className="flex items-center gap-3" aria-label="RajTest home page">
-          <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-orange-500 to-red-600 text-lg font-black text-white shadow-lg shadow-orange-500/20">
-            R
-          </div>
-          <div>
-            <div className="text-[1.7rem] font-black leading-none tracking-tight text-slate-900">RajTest</div>
-            <div className="text-[10px] font-bold uppercase tracking-[0.28em] text-slate-500">.in</div>
-          </div>
-        </Link>
-
-        <nav className="hidden items-center gap-7 text-sm font-medium text-slate-700 lg:flex">
-          {navItems.map((item) => (
-            <Link key={item.name} href={item.href} className="transition hover:text-primary-600">
-              {item.name}
-            </Link>
-          ))}
-        </nav>
-
-        <div className="hidden items-center gap-3 lg:flex">
-          <div className="hidden items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-500 xl:flex">
-            <Search className="h-4 w-4 text-slate-400" />
-            <span>Search exam</span>
-          </div>
-          <button className="rounded-full border border-slate-200 p-2 text-slate-600 transition hover:bg-slate-50" aria-label="Notifications">
-            <Bell className="h-4 w-4" />
-          </button>
-          <button className="rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition hover:border-primary-200 hover:text-primary-600">
-            Login
-          </button>
-          <button className="rounded-full bg-primary-600 px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-primary-600/20 transition hover:bg-primary-700">
-            Register
-          </button>
+    <footer className="border-t border-slate-200 bg-slate-950 text-slate-200">
+      <div className="container-shell grid gap-10 py-12 md:grid-cols-4">
+        <div>
+          <div className="mb-4 text-2xl font-black tracking-tight text-white">RajTest</div>
+          <p className="max-w-xs text-sm leading-6 text-slate-300">
+            Competitive exam preparation with mock tests, performance insights, and smart revision resources.
+          </p>
         </div>
 
-        <button className="flex items-center gap-2 rounded-full border border-slate-200 px-3 py-2 text-sm font-medium text-slate-700 lg:hidden" aria-label="Open menu">
-          <Menu className="h-4 w-4" />
-          <ChevronDown className="h-4 w-4" />
-        </button>
+        <div>
+          <h3 className="mb-4 text-sm font-semibold uppercase tracking-[0.22em] text-slate-400">Exams</h3>
+          <ul className="space-y-2 text-sm text-slate-300">
+            <li>SSC</li>
+            <li>Banking</li>
+            <li>Railway</li>
+            <li>State Exams</li>
+          </ul>
+        </div>
+
+        <div>
+          <h3 className="mb-4 text-sm font-semibold uppercase tracking-[0.22em] text-slate-400">Quick Links</h3>
+          <ul className="space-y-2 text-sm text-slate-300">
+            <li>About us</li>
+            <li>Contact</li>
+            <li>Privacy Policy</li>
+            <li>FAQs</li>
+          </ul>
+        </div>
+
+        <div>
+          <h3 className="mb-4 text-sm font-semibold uppercase tracking-[0.22em] text-slate-400">Connect</h3>
+          <ul className="space-y-2 text-sm text-slate-300">
+            <li>support@rajtest.in</li>
+            <li>+91 98765 43210</li>
+            <li>New Delhi, India</li>
+          </ul>
+        </div>
       </div>
-    </header>
+
+      <div className="border-t border-slate-800 py-4">
+        <div className="container-shell flex flex-col gap-2 text-xs text-slate-400 md:flex-row md:items-center md:justify-between">
+          <span>© 2026 RajTest.in</span>
+          <span>All rights reserved.</span>
+        </div>
+      </div>
+    </footer>
   );
 }
