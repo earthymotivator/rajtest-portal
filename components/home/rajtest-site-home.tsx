@@ -16,7 +16,11 @@ import {
   Trophy,
   X,
 } from 'lucide-react';
-import { getHomepageTestGroups, getSiteData } from '@/lib/mock-data';
+import {
+  homepageTestGroups,
+  homepageTests,
+  leaderboardEntries,
+} from '@/lib/mock-data';
 
 type InstallPrompt = Event & {
   prompt: () => Promise<void>;
@@ -87,38 +91,44 @@ function getNextTestTime() {
 
 function formatCountdown(milliseconds: number) {
   const totalSeconds = Math.max(0, Math.floor(milliseconds / 1000));
-  const hours = Math.floor(totalSeconds / 3600);
-  const minutes = Math.floor((totalSeconds % 3600) / 60);
-  const seconds = totalSeconds % 60;
-  return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+  const hours = String(Math.floor(totalSeconds / 3600)).padStart(2, '0');
+  const minutes = String(Math.floor((totalSeconds % 3600) / 60)).padStart(2, '0');
+  const seconds = String(totalSeconds % 60).padStart(2, '0');
+  return `${hours}:${minutes}:${seconds}`;
 }
 
-function HomepageTestCard({ test, index }: { test: ReturnType<typeof getSiteData>['homepageTests'][number]; index: number }) {
+function HomepageTestCard({ test, index }: { test: (typeof homepageTests)[number]; index: number }) {
   return (
-    <article className="test-card">
+    <article className="test-card rounded-[18px] overflow-hidden shadow-[0_10px_24px_rgba(35,19,0,0.06)]">
       <div className="test-cover" data-tone={(index % 7) + 1}>
         <div className="test-cover-text">
           <div className="test-cover-head">
             {test.isNew && <span className="test-cover-new">NEW</span>}
             <span className="test-cover-when">🗓 {test.publishedAt}</span>
-            <span className="test-cover-kind">Free Test</span>
+            <span className="test-cover-kind">{test.type}</span>
           </div>
-          <h4 className="test-cover-title" lang="hi">{test.title}</h4>
-          <p className="test-cover-category">{test.subject}</p>
+          <h3 className="test-cover-title">{test.title}</h3>
+          <div className="test-cover-category">{test.subject}</div>
         </div>
       </div>
+
       <div className="test-card-body">
-        <p className="test-card-exams">{test.examTags.join(' · ')}</p>
-        <div className="test-stats">
-          <span className="badge">{test.questionCount} Questions</span>
-          <span className="badge">{test.duration} Mins</span>
-          <span className="badge">{test.marks} Marks</span>
-          <span className="badge">👥 {test.attempts}</span>
-          {test.difficulty && <span className="badge badge-blue">{test.difficulty}</span>}
+        <div className="flex flex-wrap items-center gap-2 text-[10px] font-bold text-[#676e7e]">
+          <span className="rounded-full border border-[#eadfce] bg-[#fffaf2] px-2 py-1">{test.examTag}</span>
+          <span className="rounded-full border border-[#eadfce] bg-[#fffaf2] px-2 py-1">{test.subject}</span>
         </div>
+
+        <div className="test-card-exams">{test.description}</div>
+
+        <div className="test-stats">
+          <span className="badge badge-blue">{test.questionCount} Questions</span>
+          <span className="badge">{test.duration} Mins</span>
+          <span className="badge">{test.attempts.toLocaleString('en-IN')} attempts</span>
+        </div>
+
         <div className="test-card-go">
-          <Link href={`/exam/${test.slug}/instructions`} className="test-start-link">
-            Start<span className="sr-only"> — {test.title}</span>
+          <Link href={`/exam/${test.slug}/instructions`} className="test-start-link rounded-full">
+            Start Test
           </Link>
         </div>
       </div>
@@ -127,83 +137,59 @@ function HomepageTestCard({ test, index }: { test: ReturnType<typeof getSiteData
 }
 
 export function HomePage() {
-  const siteData = getSiteData();
-  const [installPrompt, setInstallPrompt] = useState<InstallPrompt | null>(null);
-  const [showInstall, setShowInstall] = useState(true);
-  const [showTelegram, setShowTelegram] = useState(true);
-  const [countdown, setCountdown] = useState('--:--:--');
   const [selectedExam, setSelectedExam] = useState('all');
-  const [selectedSubject, setSelectedSubject] = useState('all');
-  const [expandedGroups, setExpandedGroups] = useState<string[]>([]);
+  const [selectedSubject, setSelectedSubject] = useState('Rajasthan GK');
+  const [showInstall, setShowInstall] = useState(false);
   const [reminderSet, setReminderSet] = useState(false);
-
-  useEffect(() => {
-    const restoreNotices = window.setTimeout(() => {
-      try {
-        setShowInstall(localStorage.getItem('rajtest-install-dismissed') !== '1');
-        setShowTelegram(localStorage.getItem('rajtest-telegram-dismissed') !== '1');
-      } catch {
-        setShowInstall(true);
-        setShowTelegram(true);
-      }
-    }, 0);
-
-    const captureInstallPrompt = (event: Event) => {
-      event.preventDefault();
-      setInstallPrompt(event as InstallPrompt);
-    };
-    window.addEventListener('beforeinstallprompt', captureInstallPrompt);
-    return () => {
-      window.clearTimeout(restoreNotices);
-      window.removeEventListener('beforeinstallprompt', captureInstallPrompt);
-    };
-  }, []);
+  const [countdown, setCountdown] = useState('00:00:00');
 
   useEffect(() => {
     const target = getNextTestTime();
     const updateCountdown = () => setCountdown(formatCountdown(target - Date.now()));
     updateCountdown();
-    const timer = window.setInterval(updateCountdown, 1000);
-    return () => window.clearInterval(timer);
+    const interval = window.setInterval(updateCountdown, 1000);
+    return () => window.clearInterval(interval);
   }, []);
 
-  const homepageTests = siteData.homepageTests;
-  const leaderboardEntries = siteData.leaderboardEntries;
-  const homepageTestGroups = getHomepageTestGroups(siteData);
+  useEffect(() => {
+    const handleBeforeInstallPrompt = (event: Event) => {
+      event.preventDefault();
+      setShowInstall(true);
+      (event as InstallPrompt).prompt = (event as InstallPrompt).prompt || (() => Promise.resolve());
+    };
 
-  const filteredGroups = useMemo(() => homepageTestGroups.map((group) => {
-    const tests = Array.from(new Set(group.slugs))
-      .map((slug) => homepageTests.find((test) => test.slug === slug))
-      .filter((test) => test !== undefined)
-      .filter((test) => selectedExam === 'all' || test.examTags.includes(selectedExam))
-      .filter((test) => selectedSubject === 'all' || (subjectAliases[test.subject] ?? [test.subject]).includes(selectedSubject));
-    return { ...group, tests };
-  }).filter((group) => group.tests.length > 0), [homepageTestGroups, homepageTests, selectedExam, selectedSubject]);
+    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt as EventListener);
+    return () => window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt as EventListener);
+  }, []);
 
-  const dismissNotice = (key: string, close: (visible: boolean) => void) => {
-    close(false);
-    try {
-      localStorage.setItem(key, '1');
-    } catch {
-      close(false);
+  const filteredGroups = useMemo(() => {
+    return homepageTestGroups.filter((group) => {
+      const examMatches = selectedExam === 'all' || group.title === selectedExam;
+      const subjectMatches = selectedSubject === 'all' || group.tests.some((test) => {
+        const aliases = subjectAliases[selectedSubject] ?? [selectedSubject];
+        return aliases.some((alias) => test.subject.toLowerCase().includes(alias.toLowerCase()));
+      });
+      return examMatches && subjectMatches;
+    });
+  }, [selectedExam, selectedSubject]);
+
+  const handleInstall = async () => {
+    const installEvent = window.event as unknown as InstallPrompt | null;
+    if (installEvent && typeof installEvent.prompt === 'function') {
+      await installEvent.prompt();
     }
+    setShowInstall(false);
   };
 
-  const beginInstall = async () => {
-    if (!installPrompt) return;
-    await installPrompt.prompt();
-    await installPrompt.userChoice;
-    setInstallPrompt(null);
-  };
-
-  const addReminder = () => {
-    const event = new CustomEvent('rajtest-reminder', { detail: { title: 'आज का RajTest', url: window.location.href } });
+  const handleReminder = () => {
+    if (reminderSet) return;
+    const event = new CustomEvent('rajtest-reminder', { detail: { type: 'next-test' } });
     window.dispatchEvent(event);
     setReminderSet(true);
   };
 
   return (
-    <div>
+    <div className="bg-[#fffaf4] text-[#231300]">
       {showInstall && (
         <section className="border-b border-[#e7c9a8] bg-[#fff5e6]" aria-label="ऐप इंस्टॉल सूचना">
           <div className="container-shell flex flex-wrap items-center justify-between gap-3 py-2.5 text-sm text-[#231300]">
@@ -215,198 +201,304 @@ export function HomePage() {
               </div>
             </div>
             <div className="flex items-center gap-2">
-              <button onClick={beginInstall} className="min-h-9 bg-[#1a7f45] px-3 text-xs font-bold text-white disabled:opacity-70" disabled={!installPrompt}>
-                {installPrompt ? 'Install' : 'Open in Chrome'}
+              <button onClick={handleInstall} className="rounded-full bg-[#1a7f45] px-3 py-1.5 text-xs font-bold text-white">
+                Install
               </button>
-              <button onClick={() => dismissNotice('rajtest-install-dismissed', setShowInstall)} className="flex h-9 w-9 items-center justify-center text-[#676e7e] hover:bg-black/5" aria-label="Install notice close">
-                <X className="h-4 w-4" />
-              </button>
-            </div>
-          </div>
-        </section>
-      )}
-
-      {showTelegram && (
-        <section className="border-b border-[#bfe3c8] bg-[#eff8f0]" aria-label="Telegram सूचना">
-          <div className="container-shell flex min-h-10 items-center justify-between gap-3 text-sm text-[#14532d]">
-            <p className="min-w-0 truncate">Daily free infographic notes &amp; test updates on Telegram</p>
-            <div className="flex shrink-0 items-center gap-2">
-              <a href="https://t.me/rajtestofficial" target="_blank" rel="noreferrer" className="font-bold underline decoration-[#1a7f45] underline-offset-2">Join</a>
-              <button onClick={() => dismissNotice('rajtest-telegram-dismissed', setShowTelegram)} className="flex h-9 w-9 items-center justify-center hover:bg-black/5" aria-label="Telegram close">
-                <X className="h-4 w-4" />
+              <button onClick={() => setShowInstall(false)} className="rounded-full border border-[#e7c9a8] bg-white px-3 py-1.5 text-xs font-bold text-[#231300]">
+                Later
               </button>
             </div>
           </div>
         </section>
       )}
 
-      <section className="container-shell py-6 md:py-9">
-        <div className="max-w-4xl">
-          <p className="text-sm font-bold text-[#9a4a12]">🇮🇳 Govt. Exam की तैयारी, अब और स्मार्ट</p>
-          <h1 className="mt-2 text-3xl font-extrabold leading-tight text-[#231300] md:text-4xl">
-            Rajtest.in — सरकारी परीक्षा टेस्ट सीरीज़
-          </h1>
-          <p className="mt-3 max-w-3xl text-sm leading-6 text-[#676e7e] md:text-base">
-            Raj Test है <strong className="font-bold text-[#231300]">RPSC, CET, REET, Patwar, SSC, RRB NTPC, IBPS</strong> समेत राजस्थान की सभी भर्ती परीक्षाओं के लिए एक उपयोगी वेबसाइट है।
-          </p>
-          <Link href="/exam/rajtest-pyq-12/instructions" className="mt-5 inline-flex min-h-10 items-center gap-2 bg-[#1a7f45] px-4 text-sm font-bold text-white transition hover:bg-[#14532d]">
-            Start Free Test <ArrowRight className="h-4 w-4" />
+      <header className="sticky top-0 z-40 border-b border-[#ece9e2] bg-white/90 backdrop-blur">
+        <div className="container-shell flex min-h-[62px] items-center justify-between gap-4">
+          <Link href="/" className="flex shrink-0 items-center gap-2.5" aria-label="Rajtest.in home">
+            <div className="flex h-[42px] w-[42px] items-center justify-center rounded-lg bg-[#fff3e0] text-xl shadow-sm">🧠</div>
+            <span>
+              <span className="block text-[17px] font-extrabold leading-5 text-[#231300]">Rajtest.in</span>
+              <span className="block text-[11px] leading-4 text-[#676e7e]">Raj Test Series</span>
+            </span>
           </Link>
-        </div>
-        <div className="mt-6 grid max-w-2xl grid-cols-3 divide-x divide-[#eadfce] border-y border-[#eadfce] bg-white">
-          {[
-            { value: '411', label: 'पेपर', icon: BookOpen },
-            { value: '30,531', label: 'टेस्ट दिए गए', icon: CheckCircle2 },
-            { value: '1,892', label: 'छात्र', icon: GraduationCap },
-          ].map(({ value, label, icon: Icon }) => (
-            <div key={label} className="px-2 py-3 text-center sm:px-5 sm:py-4">
-              <Icon className="mx-auto h-4 w-4 text-[#1a7f45]" />
-              <p className="mt-2 text-lg font-extrabold tabular-nums text-[#231300] sm:text-xl">{value}</p>
-              <p className="text-[10px] leading-4 text-[#676e7e] sm:text-xs">{label}</p>
-            </div>
-          ))}
-        </div>
-      </section>
 
-      <section className="border-y border-[#ece9e2] bg-white py-3" aria-label="इस सप्ताह ��े टॉप अभ्यर्थी">
-        <div className="container-shell mb-2 flex items-center gap-2 text-sm font-bold text-[#9a4a12]"><Flame className="h-4 w-4" /> This Week</div>
-        <div className="overflow-hidden">
-          <div className="rajtest-leader-track flex w-max gap-3 px-4">
-            {[...leaderboardEntries, ...leaderboardEntries].map((leader, index) => (
-              <div key={`${leader.rank}-${index}`} className="flex min-w-[170px] items-center gap-2 border border-[#ece9e2] bg-[#fffdfa] px-3 py-2">
-                <span className="text-sm font-extrabold text-[#9a4a12]">{index % leaderboardEntries.length < 3 ? ['🥇', '🥈', '🥉'][index % leaderboardEntries.length] : `#${index % leaderboardEntries.length + 1}`}</span>
-                <span className="min-w-0 flex-1 truncate text-xs font-semibold text-[#231300]">{leader.name}</span>
-                <span className="text-xs font-extrabold tabular-nums text-[#1a7f45]">{leader.score}</span>
-              </div>
-            ))}
+          <nav className="hidden items-center gap-6 text-sm font-semibold text-[#231300] md:flex" aria-label="Main navigation">
+            <Link href="#available-tests" className="transition hover:text-[#9a4a12]">Tests</Link>
+            <Link href="#how-it-works" className="transition hover:text-[#9a4a12]">How it works</Link>
+            <Link href="#about" className="transition hover:text-[#9a4a12]">About</Link>
+            <Link href="/leaderboard" className="transition hover:text-[#9a4a12]">Leaderboard</Link>
+          </nav>
+
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={handleReminder}
+              className="hidden items-center gap-2 rounded-full border border-[#e7c9a8] bg-[#fff8ef] px-3 py-2 text-xs font-bold text-[#231300] md:inline-flex"
+            >
+              <Bell className="h-3.5 w-3.5 text-[#9a4a12]" />
+              {reminderSet ? 'Reminder set' : 'Notify me'}
+            </button>
+            <Link href="/exams" className="inline-flex items-center gap-2 rounded-full bg-[#1a7f45] px-4 py-2.5 text-sm font-bold text-white shadow-[0_12px_20px_rgba(26,127,69,0.22)] transition hover:bg-[#14532d]">
+              Free Test <ArrowRight className="h-4 w-4" />
+            </Link>
           </div>
         </div>
-      </section>
+      </header>
 
-      <section className="container-shell py-6" aria-labelledby="next-test-heading">
-        <div className="grid gap-4 border border-[#e7c9a8] bg-[#fffaf2] p-4 md:grid-cols-[1fr_auto] md:items-center md:p-5">
-          <div>
-            <p className="flex items-center gap-2 text-sm font-bold text-[#9a4a12]"><Clock3 className="h-4 w-4" /> New Test Live Time</p>
-            <h2 id="next-test-heading" className="mt-2 text-lg font-extrabold text-[#231300]">🗺️ शाम का भूगोल · संविधान · विज्ञान — 29 अक्टूबर</h2>
-            <div className="mt-3 flex flex-wrap items-center gap-2 text-xs text-[#676e7e]">
-              <span className="bg-white px-2.5 py-1">Geography</span>
-              <span className="bg-white px-2.5 py-1">CET (12th Based)</span>
-              <span className="bg-white px-2.5 py-1">CET (Graduation Based)</span>
-              <span className="flex items-center gap-1"><ListFilter className="h-3.5 w-3.5" />10 Questions</span>
-              <span className="flex items-center gap-1"><Clock3 className="h-3.5 w-3.5" />10 Mins</span>
-            </div>
-          </div>
-          <div className="flex flex-wrap items-center gap-2 md:justify-end">
-            <div className="min-w-[136px] bg-white px-3 py-2 text-center">
-              <p className="text-[10px] font-bold uppercase text-[#676e7e]">Coming up</p>
-              <p className="mt-1 text-lg font-extrabold tabular-nums text-[#231300]">{countdown}</p>
-              <p className="text-[10px] text-[#676e7e]">IST · Daily</p>
-            </div>
-            <Link href="/exam/evening-geography-29/instructions" className="inline-flex min-h-10 items-center gap-2 bg-[#1a7f45] px-3 text-xs font-bold text-white hover:bg-[#14532d]">Free Test <ArrowRight className="h-4 w-4" /></Link>
-            <button onClick={addReminder} className="inline-flex min-h-10 items-center gap-2 border border-[#1a7f45] bg-white px-3 text-xs font-bold text-[#1a7f45] hover:bg-[#f1faf3]"><Bell className="h-4 w-4" />{reminderSet ? 'Added' : 'Remind me'}</button>
-          </div>
-        </div>
-      </section>
+      <main>
+        <section className="relative overflow-hidden bg-[radial-gradient(circle_at_top_left,_rgba(154,74,18,0.08),transparent_30%),linear-gradient(180deg,#fffaf4_0%,#fff7ef_100%)]">
+          <div className="container-shell py-8 md:py-12">
+            <div className="grid items-center gap-7 lg:grid-cols-[1.15fr_0.85fr]">
+              <div>
+                <p className="text-sm font-bold text-[#9a4a12]">🇮🇳 Govt. Exam की तैयारी, अब और स्मार्ट</p>
+                <h1 className="mt-2 text-3xl font-extrabold leading-tight text-[#231300] md:text-5xl">
+                  Rajtest.in — सरकारी परीक्षा टेस्ट सीरीज़
+                </h1>
+                <p className="mt-3 max-w-3xl text-sm leading-6 text-[#676e7e] md:text-base">
+                  Raj Test है <strong className="font-bold text-[#231300]">RPSC, CET, REET, Patwar, SSC, RRB NTPC, IBPS</strong> समेत राजस्थान की सभी भर्ती परीक्षाओं के लिए एक उपयोगी वेबसाइट है।
+                </p>
 
-      <section id="available-tests" className="container-shell py-4 md:py-7">
-        <div className="flex flex-col gap-4 border-b border-[#ece9e2] pb-4 sm:flex-row sm:items-end sm:justify-between">
-          <div>
-            <p className="text-sm font-bold text-[#9a4a12]">{homepageTests.length} tests</p>
-            <h2 className="mt-1 text-2xl font-extrabold text-[#231300]">Available Tests</h2>
-          </div>
-          <div className="grid grid-cols-2 gap-2 sm:flex">
-            <label className="relative">
-              <span className="sr-only">परीक्षा से छाँटें</span>
-              <select value={selectedExam} onChange={(event) => setSelectedExam(event.target.value)} className="h-10 w-full appearance-none border border-[#d9d4ca] bg-white py-2 pl-3 pr-9 text-xs font-medium text-[#231300] outline-none focus:border-[#1a7f45] sm:w-44">
-                <option value="all">All Exams</option>
-                {examOptions.map((exam) => <option key={exam} value={exam}>{exam}</option>)}
-              </select>
-              <ChevronDown className="pointer-events-none absolute right-3 top-3 h-4 w-4 text-[#676e7e]" />
-            </label>
-            <label className="relative">
-              <span className="sr-only">विषय से छाँटें</span>
-              <select value={selectedSubject} onChange={(event) => setSelectedSubject(event.target.value)} className="h-10 w-full appearance-none border border-[#d9d4ca] bg-white py-2 pl-3 pr-9 text-xs font-medium text-[#231300] outline-none focus:border-[#1a7f45] sm:w-44">
-                <option value="all">All Subjects</option>
-                {subjectOptions.map((subject) => <option key={subject} value={subject}>{subject}</option>)}
-              </select>
-              <ChevronDown className="pointer-events-none absolute right-3 top-3 h-4 w-4 text-[#676e7e]" />
-            </label>
-          </div>
-        </div>
-
-        <div className="divide-y divide-[#ece9e2]">
-          {filteredGroups.map((group) => {
-            const expanded = expandedGroups.includes(group.title);
-            const visibleTests = expanded || group.isNew ? group.tests : group.tests.slice(0, 6);
-            return (
-              <section key={group.title} className="py-5">
-                <div className="mb-3 flex items-center justify-between gap-3">
-                  <div className="flex items-center gap-2">
-                    <h3 className="font-extrabold text-[#231300]">{group.title}</h3>
-                    <span className="text-xs text-[#676e7e]">{group.count} tests</span>
-                    {group.isNew && <span className="bg-[#ffe6c9] px-2 py-0.5 text-[10px] font-extrabold text-[#9a4a12]">NEW</span>}
-                  </div>
-                  {group.tests.length > visibleTests.length && (
-                    <button onClick={() => setExpandedGroups((current) => [...current, group.title])} className="text-xs font-bold text-[#1a7f45] hover:underline">
-                      → {group.tests.length - visibleTests.length} more
-                    </button>
-                  )}
+                <div className="mt-5 flex flex-wrap items-center gap-3">
+                  <Link href="/exam/rajtest-pyq-12/instructions" className="inline-flex min-h-11 items-center gap-2 rounded-full bg-[#1a7f45] px-5 text-sm font-bold text-white transition hover:bg-[#14532d]">
+                    Start Free Test <ArrowRight className="h-4 w-4" />
+                  </Link>
+                  <Link href="#available-tests" className="inline-flex min-h-11 items-center gap-2 rounded-full border border-[#e7c9a8] bg-white px-5 text-sm font-bold text-[#231300] transition hover:border-[#d7b180]">
+                    Browse Tests <ChevronDown className="h-4 w-4" />
+                  </Link>
                 </div>
-                <div className="catalogue-row-scroll">
-                  {visibleTests.map((test, index) => (
-                    <div className="catalogue-row-item" key={`${group.title}-${test.id}`}>
-                      <HomepageTestCard test={test} index={index} />
+
+                <div className="mt-6 grid max-w-2xl grid-cols-3 divide-x divide-[#eadfce] border-y border-[#eadfce] bg-white/80 backdrop-blur-sm">
+                  {[
+                    { value: '411', label: 'पेपर', icon: BookOpen },
+                    { value: '30,531', label: 'टेस्ट दिए गए', icon: CheckCircle2 },
+                    { value: '1,892', label: 'छात्र', icon: GraduationCap },
+                  ].map(({ value, label, icon: Icon }) => (
+                    <div key={label} className="px-2 py-3 text-center sm:px-5 sm:py-4">
+                      <Icon className="mx-auto h-4 w-4 text-[#1a7f45]" />
+                      <p className="mt-2 text-lg font-extrabold tabular-nums text-[#231300] sm:text-xl">{value}</p>
+                      <p className="text-[10px] leading-4 text-[#676e7e] sm:text-xs">{label}</p>
                     </div>
                   ))}
                 </div>
-              </section>
-            );
-          })}
-          {filteredGroups.length === 0 && <p className="py-12 text-center text-sm text-[#676e7e]">इन फ़िल्टर के लिए कोई टेस्ट नहीं मिला।</p>}
-        </div>
-      </section>
+              </div>
 
-      <section className="border-y border-[#ece9e2] bg-white py-8" aria-labelledby="tests-by-exam">
-        <div className="container-shell">
-          <div className="mb-4 flex items-center justify-between gap-3"><h2 id="tests-by-exam" className="text-lg font-extrabold text-[#231300]">Tests by Exam</h2><button onClick={() => { setSelectedExam('all'); document.getElementById('available-tests')?.scrollIntoView({ behavior: 'smooth' }); }} className="text-xs font-bold text-[#1a7f45] hover:underline">Reset</button></div>
-          <div className="flex flex-wrap gap-2">
-            {examOptions.map((exam) => <button key={exam} onClick={() => { setSelectedExam(exam); document.getElementById('available-tests')?.scrollIntoView({ behavior: 'smooth' }); }} className={`rounded-full border px-3 py-2 text-xs font-semibold ${selectedExam === exam ? 'border-[#1a7f45] bg-[#ecf9f1] text-[#14532d]' : 'border-[#ece9e2] bg-white text-[#231300]'}`}>{exam}</button>)}
+              <div className="relative">
+                <div className="rounded-[30px] border border-[#eadfce] bg-[#fff8ef] p-4 shadow-[0_22px_50px_rgba(154,74,18,0.08)] md:p-6">
+                  <div className="rounded-[24px] bg-[#231300] p-5 text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]">
+                    <div className="flex items-center justify-between gap-3">
+                      <div>
+                        <p className="text-[11px] font-bold uppercase tracking-[0.12em] text-orange-200">Next test live</p>
+                        <h2 className="mt-2 text-xl font-extrabold">🗺️ भूगोल · संविधान · विज्ञान</h2>
+                      </div>
+                      <span className="rounded-full bg-white/10 px-2.5 py-1 text-[10px] font-bold uppercase">29 Oct</span>
+                    </div>
+
+                    <div className="mt-5 grid grid-cols-3 gap-2 text-center">
+                      {[
+                        { label: 'Time left', value: countdown },
+                        { label: 'Question', value: '10' },
+                        { label: 'Marks', value: '10' },
+                      ].map(({ label, value }) => (
+                        <div key={label} className="rounded-2xl border border-white/10 bg-white/5 p-2.5">
+                          <p className="text-[10px] uppercase text-orange-100/80">{label}</p>
+                          <p className="mt-2 text-base font-extrabold tabular-nums text-white">{value}</p>
+                        </div>
+                      ))}
+                    </div>
+
+                    <div className="mt-5 flex flex-wrap items-center gap-2 text-[11px] text-orange-50/80">
+                      <span className="rounded-full bg-white/10 px-2.5 py-1">Geography</span>
+                      <span className="rounded-full bg-white/10 px-2.5 py-1">CET (12th Based)</span>
+                      <span className="rounded-full bg-white/10 px-2.5 py-1">CET (Graduation Based)</span>
+                    </div>
+
+                    <div className="mt-5 flex items-center justify-between gap-3 border-t border-white/10 pt-4">
+                      <div>
+                        <p className="text-[10px] uppercase text-orange-100/80">Starts at</p>
+                        <p className="font-bold">4:00 PM</p>
+                      </div>
+                      <Link href="/exam/rajtest-pyq-12/instructions" className="inline-flex items-center gap-2 rounded-full bg-[#f5ab4c] px-4 py-2.5 text-sm font-bold text-[#231300]">
+                        Attempt now <ArrowRight className="h-4 w-4" />
+                      </Link>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      <section className="container-shell py-8" aria-labelledby="tests-by-subject">
-        <h2 id="tests-by-subject" className="mb-4 text-lg font-extrabold text-[#231300]">Tests by Subject</h2>
-        <div className="flex flex-wrap gap-2">
-          {subjectOptions.map((subject) => <button key={subject} onClick={() => { setSelectedSubject(subject); document.getElementById('available-tests')?.scrollIntoView({ behavior: 'smooth' }); }} className={`rounded-full border px-3 py-2 text-xs font-semibold ${selectedSubject === subject ? 'border-[#1a7f45] bg-[#ecf9f1] text-[#14532d]' : 'border-[#ece9e2] bg-white text-[#231300]'}`}>{subject}</button>)}
-        </div>
-      </section>
-
-      <section className="border-y border-[#ece9e2] bg-[#fffdfa] py-9" aria-labelledby="after-test-heading">
-        <div className="container-shell">
-          <h2 id="after-test-heading" className="text-xl font-extrabold text-[#231300]">What happens after a test?</h2>
-          <p className="mt-1 text-sm text-[#676e7e]">A simple 4-step improvement process</p>
-          <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-            {[
-              { icon: CheckCircle2, title: 'Take a test and know your level', text: 'Get a basic score, or your official rank when signed in.', emoji: '📝' },
-              { icon: ListFilter, title: 'Find your weak topics', text: 'See your accuracy, speed and strongest/weakest topics.', emoji: '📊' },
-              { icon: Medal, title: 'Revise the questions you got wrong', text: 'Use the Wrong Notebook, bookmarks and reminders.', emoji: '🔁' },
-              { icon: Trophy, title: 'Build your Booster Test', text: 'Practise the topics you are weakest in.', emoji: '🚀' },
-            ].map(({ icon: Icon, title, text, emoji }, index) => <article key={title} className="border border-[#ece9e2] bg-white p-4"><div className="flex items-center justify-between"><span className="text-2xl">{emoji}</span><Icon className="h-5 w-5 text-[#1a7f45]" /></div><h3 className="mt-3 text-sm font-extrabold text-[#231300]">{title}</h3><p className="mt-2 text-xs leading-5 text-[#676e7e]">{text}</p></article>)}
+        <section className="border-y border-[#ece9e2] bg-white py-3" aria-label="इस सप्ताह के टॉप अभ्यर्थी">
+          <div className="container-shell mb-2 flex items-center gap-2 text-sm font-bold text-[#9a4a12]"><Flame className="h-4 w-4" /> This Week</div>
+          <div className="overflow-hidden">
+            <div className="rajtest-leader-track flex w-max gap-3 px-4">
+              {[...leaderboardEntries, ...leaderboardEntries].map((leader, index) => (
+                <div key={`${leader.name}-${index}`} className="flex min-w-[220px] items-center gap-3 rounded-full border border-[#ece9e2] bg-[#fffaf5] px-3 py-2">
+                  <div className={`flex h-8 w-8 items-center justify-center rounded-full text-[11px] font-black text-[#231300] ${leader.color}`}>
+                    {leader.rank}
+                  </div>
+                  <div className="min-w-0">
+                    <p className="truncate text-sm font-extrabold text-[#231300]">{leader.name}</p>
+                    <p className="text-[10px] uppercase tracking-[0.12em] text-[#676e7e]">{leader.score}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      <section id="about" className="container-shell py-9 pb-14 md:pb-9">
-        <h2 className="text-xl font-extrabold text-[#231300]">About Rajtest.in — Rajasthan Government Exam Test Series</h2>
-        <p className="mt-3 max-w-5xl text-sm leading-7 text-[#676e7e]">Rajtest.in — also written Raj Test — is a free, Hindi-language mock test platform for students preparing for Rajasthan government recruitment and competitive exams.</p>
-        <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-          <div className="border border-[#ece9e2] bg-white p-4"><CheckCircle2 className="h-5 w-5 text-[#1a7f45]" /><p className="mt-2 text-sm font-bold text-[#231300]">Start a test without signin</p><p className="mt-1 text-xs text-[#676e7e]">Fast access to practice sets</p></div>
-          <div className="border border-[#ece9e2] bg-white p-4"><ListFilter className="h-5 w-5 text-[#1a7f45]" /><p className="mt-2 text-sm font-bold text-[#231300]">Weak topic analysis</p><p className="mt-1 text-xs text-[#676e7e]">Track your performance by subject</p></div>
-          <div className="border border-[#ece9e2] bg-white p-4"><BookOpen className="h-5 w-5 text-[#1a7f45]" /><p className="mt-2 text-sm font-bold text-[#231300]">Wrong question notebook</p><p className="mt-1 text-xs text-[#676e7e]">Revision made easy</p></div>
-          <div className="border border-[#ece9e2] bg-white p-4"><Trophy className="h-5 w-5 text-[#1a7f45]" /><p className="mt-2 text-sm font-bold text-[#231300]">Leaderboards and ranks</p><p className="mt-1 text-xs text-[#676e7e]">Benchmark your progress</p></div>
-        </div>
-      </section>
+        <section id="available-tests" className="container-shell py-4 md:py-7">
+          <div className="flex flex-col gap-4 border-b border-[#ece9e2] pb-4 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+              <p className="text-sm font-bold text-[#9a4a12]">{homepageTests.length} tests</p>
+              <h2 className="mt-1 text-2xl font-extrabold text-[#231300]">Available Tests</h2>
+            </div>
+            <div className="grid grid-cols-2 gap-2 sm:flex">
+              <label className="relative">
+                <span className="sr-only">परीक्षा से छाँटें</span>
+                <select
+                  value={selectedExam}
+                  onChange={(event) => setSelectedExam(event.target.value)}
+                  className="appearance-none rounded-full border border-[#ece9e2] bg-white px-3 py-2 text-xs font-semibold text-[#231300] outline-none ring-0"
+                >
+                  <option value="all">All Exams</option>
+                  {examOptions.map((exam) => (
+                    <option key={exam} value={exam}>{exam}</option>
+                  ))}
+                </select>
+              </label>
+
+              <label className="relative">
+                <span className="sr-only">विषय से छाँटें</span>
+                <select
+                  value={selectedSubject}
+                  onChange={(event) => setSelectedSubject(event.target.value)}
+                  className="appearance-none rounded-full border border-[#ece9e2] bg-white px-3 py-2 text-xs font-semibold text-[#231300] outline-none ring-0"
+                >
+                  {subjectOptions.map((subject) => (
+                    <option key={subject} value={subject}>{subject}</option>
+                  ))}
+                </select>
+              </label>
+            </div>
+          </div>
+
+          <div className="mt-5">
+            {filteredGroups.length ? (
+              filteredGroups.map((group) => {
+                const visibleTests = group.tests.filter((test) => {
+                  const aliases = subjectAliases[selectedSubject] ?? [selectedSubject];
+                  return selectedSubject === 'all' || aliases.some((alias) => test.subject.toLowerCase().includes(alias.toLowerCase()));
+                });
+
+                if (!visibleTests.length) return null;
+
+                return (
+                  <section key={group.title} className="mb-8">
+                    <div className="mb-3 flex items-center justify-between gap-3">
+                      <h3 className="text-lg font-extrabold text-[#231300]">{group.title}</h3>
+                      <span className="text-xs font-bold uppercase tracking-[0.12em] text-[#676e7e]">{visibleTests.length} tests</span>
+                    </div>
+                    <div className="catalogue-row-scroll">
+                      {visibleTests.map((test, index) => (
+                        <div className="catalogue-row-item" key={`${group.title}-${test.id}`}>
+                          <HomepageTestCard test={test} index={index} />
+                        </div>
+                      ))}
+                    </div>
+                  </section>
+                );
+              })
+            ) : (
+              <p className="py-12 text-center text-sm text-[#676e7e]">इन फ़िल्टर के लिए कोई टेस्ट नहीं मिला।</p>
+            )}
+          </div>
+        </section>
+
+        <section className="border-y border-[#ece9e2] bg-white py-8" aria-labelledby="tests-by-exam">
+          <div className="container-shell">
+            <div className="mb-4 flex items-center justify-between gap-3">
+              <h2 id="tests-by-exam" className="text-lg font-extrabold text-[#231300]">Tests by Exam</h2>
+              <button onClick={() => { setSelectedExam('all'); document.getElementById('available-tests')?.scrollIntoView({ behavior: 'smooth' }); }} className="text-xs font-bold text-[#1a7f45] hover:underline">
+                Reset
+              </button>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {['all', ...examOptions].map((exam) => (
+                <button
+                  key={exam}
+                  onClick={() => {
+                    setSelectedExam(exam === 'all' ? 'all' : exam);
+                    document.getElementById('available-tests')?.scrollIntoView({ behavior: 'smooth' });
+                  }}
+                  className={`rounded-full border px-3 py-2 text-xs font-semibold ${selectedExam === exam ? 'border-[#1a7f45] bg-[#ecf9f1] text-[#14532d]' : 'border-[#ece9e2] bg-white text-[#231300]'}`}
+                >
+                  {exam === 'all' ? 'All Exams' : exam}
+                </button>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <section className="border-y border-[#ece9e2] bg-[#fffdfa] py-9" aria-labelledby="after-test-heading">
+          <div className="container-shell">
+            <h2 id="after-test-heading" className="text-xl font-extrabold text-[#231300]">What happens after a test?</h2>
+            <p className="mt-1 text-sm text-[#676e7e]">A simple 4-step improvement process</p>
+            <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+              {[
+                { icon: CheckCircle2, title: 'Take a test and know your level', text: 'Get a basic score, or your official rank when signed in.', emoji: '📝' },
+                { icon: ListFilter, title: 'Find your weak topics', text: 'See your accuracy, speed and strongest/weakest topics.', emoji: '📊' },
+                { icon: Medal, title: 'Revise the questions you got wrong', text: 'Use the Wrong Notebook, bookmarks and reminders.', emoji: '🔁' },
+                { icon: Trophy, title: 'Build your Booster Test', text: 'Practise the topics you are weakest in.', emoji: '🚀' },
+              ].map(({ icon: Icon, title, text, emoji }, index) => (
+                <article key={title} className="rounded-[20px] border border-[#ece9e2] bg-white p-4 shadow-[0_10px_22px_rgba(35,19,0,0.04)]">
+                  <div className="flex items-center justify-between">
+                    <span className="text-2xl">{emoji}</span>
+                    <Icon className="h-5 w-5 text-[#1a7f45]" />
+                  </div>
+                  <h3 className="mt-3 text-sm font-extrabold text-[#231300]">{title}</h3>
+                  <p className="mt-2 text-xs leading-5 text-[#676e7e]">{text}</p>
+                  <div className="mt-3 text-[10px] font-bold uppercase tracking-[0.1em] text-[#9a4a12]">Step {index + 1}</div>
+                </article>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <section id="about" className="container-shell py-9 pb-14 md:pb-9">
+          <div className="grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
+            <div>
+              <p className="text-sm font-bold text-[#9a4a12]">About Rajtest.in</p>
+              <h2 className="mt-2 text-2xl font-extrabold text-[#231300]">Rajasthan Government Exam Test Series</h2>
+              <p className="mt-3 max-w-5xl text-sm leading-7 text-[#676e7e]">
+                Rajtest.in — also written Raj Test — is a free, Hindi-language mock test platform for students preparing for Rajasthan government recruitment and competitive exams. It helps candidates practice with exam-style questions, get topic-wise feedback, and monitor their performance through leaderboards and progress tracking.
+              </p>
+            </div>
+            <div className="grid gap-3 sm:grid-cols-2">
+              <div className="rounded-[20px] border border-[#ece9e2] bg-white p-4">
+                <CheckCircle2 className="h-5 w-5 text-[#1a7f45]" />
+                <p className="mt-2 text-sm font-bold text-[#231300]">Start a test without signin</p>
+                <p className="mt-1 text-xs text-[#676e7e]">Fast access to practice sets</p>
+              </div>
+              <div className="rounded-[20px] border border-[#ece9e2] bg-white p-4">
+                <BookOpen className="h-5 w-5 text-[#1a7f45]" />
+                <p className="mt-2 text-sm font-bold text-[#231300]">Mock tests by subject</p>
+                <p className="mt-1 text-xs text-[#676e7e]">Targeted practice for weak topics</p>
+              </div>
+              <div className="rounded-[20px] border border-[#ece9e2] bg-white p-4">
+                <Trophy className="h-5 w-5 text-[#1a7f45]" />
+                <p className="mt-2 text-sm font-bold text-[#231300]">Leaderboards and ranks</p>
+                <p className="mt-1 text-xs text-[#676e7e]">Benchmark your progress</p>
+              </div>
+              <div className="rounded-[20px] border border-[#ece9e2] bg-white p-4">
+                <Clock3 className="h-5 w-5 text-[#1a7f45]" />
+                <p className="mt-2 text-sm font-bold text-[#231300]">Time-bound practice</p>
+                <p className="mt-1 text-xs text-[#676e7e]">Improve speed and accuracy</p>
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
     </div>
   );
 }
