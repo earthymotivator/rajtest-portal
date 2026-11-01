@@ -1,8 +1,9 @@
 import Link from 'next/link';
 import { ArrowRight, Clock3, Gauge, Star } from 'lucide-react';
-import { examCategories, exams } from '@/lib/mock-data';
+import { getSiteData } from '@/lib/mock-data';
 
 export function ExamListingPage({ slug }: { slug: string }) {
+  const { examCategories, exams } = getSiteData();
   const category = examCategories.find((item) => item.slug === slug);
   const filtered = category ? exams.filter((exam) => exam.category.toLowerCase() === category.title.toLowerCase()) : [];
   const title = category?.title ?? 'परीक्षा';
@@ -40,14 +41,12 @@ export function ExamListingPage({ slug }: { slug: string }) {
               <div className="mt-6 flex items-center justify-between">
                 <div className="text-sm font-semibold text-emerald-700">पूरी तरह मुफ़्त</div>
                 <Link href={`/exam/${exam.slug}/instructions`} className="inline-flex items-center gap-2 rounded-sm bg-primary-600 px-4 py-2 text-sm font-semibold text-white">
-                  टेस्ट शुरू करें <ArrowRight className="h-4 w-4" />
+                  आज़माएँ <ArrowRight className="h-4 w-4" />
                 </Link>
               </div>
             </div>
           </div>
-        )) : (
-          <div className="card p-8 text-slate-600">इस परीक्षा के टेस्ट जल्द उपलब्ध होंगे।</div>
-        )}
+        )) : <div className="col-span-full rounded border border-dashed border-slate-200 bg-slate-50 p-6 text-sm text-slate-600">कोई टेस्ट उपलब्ध नहीं है।</div>}
       </div>
     </div>
   );

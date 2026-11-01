@@ -2,8 +2,8 @@
 
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
-import { ArrowRight, ArrowUpRight, BriefcaseBusiness, CheckCircle2, CircleDashed, TrendingUp, Users } from 'lucide-react';
-import { adminRecentExams, adminStats, dashboardResults } from '@/lib/mock-data';
+import { ArrowRight, ArrowUpRight, BriefcaseBusiness, CheckCircle2, CircleDashed, Database, PlusCircle, TrendingUp, Users } from 'lucide-react';
+import { addExamToSiteData, getSiteData } from '@/lib/mock-data';
 import { getExamBySlug, getQuestionsForExam } from '@/lib/exam';
 
 type StoredResult = {
@@ -15,17 +15,24 @@ type StoredResult = {
   answers?: Record<string, number>;
 };
 
+type ExamForm = {
+  title: string;
+  category: string;
+  duration: number;
+  totalQuestions: number;
+  description: string;
+  difficulty: 'Easy' | 'Medium' | 'Hard';
+};
+
 export function ResultReviewPage({ examId }: { examId: string }) {
   const exam = getExamBySlug(examId);
   const questions = getQuestionsForExam(examId);
-  const fallback = dashboardResults.find((item) => item.examId === examId);
+  const fallback = getSiteData().dashboardResults.find((item) => item.examId === examId);
   const [result, setResult] = useState<StoredResult | null>(null);
 
   useEffect(() => {
     try {
       const saved = localStorage.getItem(`rajtest-result-${examId}`);
-      // The result is restored after hydration to keep server and client markup aligned.
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setResult(saved ? JSON.parse(saved) as StoredResult : null);
     } catch {
       setResult(null);
@@ -83,19 +90,59 @@ export function ResultReviewPage({ examId }: { examId: string }) {
         </div>
 
         <div className="mt-8 flex flex-col justify-between gap-3 border-t border-slate-200 pt-6 sm:flex-row">
-          <Link href="/dashboard" className="inline-flex min-h-11 items-center justify-center border border-slate-200 bg-white px-5 font-semibold text-slate-700">
-            मेरी तैयारी
-          </Link>
-          <Link href="/exams" className="inline-flex min-h-11 items-center justify-center gap-2 bg-primary-600 px-5 font-semibold text-white">
-            अगला टेस्ट चुनें <TrendingUp className="h-4 w-4" />
-          </Link>
+          <Link href="/dashboard" className="inline-flex min-h-11 items-center justify-center border border-slate-200 bg-white px-5 font-semibold text-slate-700">मेरी तैयारी</Link>
+          <Link href="/exams" className="inline-flex min-h-11 items-center justify-center gap-2 bg-primary-600 px-5 font-semibold text-white">अगला टेस्ट चुनें <TrendingUp className="h-4 w-4" /></Link>
         </div>
       </div>
     </div>
   );
 }
 
+const emptyForm: ExamForm = {
+  title: '',
+  category: 'General',
+  duration: 15,
+  totalQuestions: 10,
+  description: '',
+  difficulty: 'Medium',
+};
+
 export function AdminPage() {
+  const [siteData, setSiteData] = useState(() => getSiteData());
+  const [form, setForm] = useState<ExamForm>(emptyForm);
+
+  const refresh = () => setSiteData(getSiteData());
+
+  useEffect(() => {
+    refresh();
+  }, []);
+
+  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (!form.title.trim()) return;
+
+    addExamToSiteData({
+      id: `admin-${Date.now()}`,
+      slug: form.title.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
+      title: form.title.trim(),
+      category: form.category,
+      duration: form.duration,
+      totalQuestions: form.totalQuestions,
+      difficulty: form.difficulty,
+      level: 'Admin Added',
+      status: 'Live',
+      attempts: 0,
+      price: 0,
+      description: form.description || 'Created from admin panel.',
+      icon: '📝',
+      highlights: ['Admin added', 'Live list', 'Real data ready'],
+      syllabus: [form.category],
+    });
+
+    setForm(emptyForm);
+    refresh();
+  };
+
   return (
     <div className="container-shell py-10 md:py-14">
       <div className="flex flex-col gap-4 border-b border-slate-200 pb-6 sm:flex-row sm:items-end sm:justify-between">
@@ -109,7 +156,7 @@ export function AdminPage() {
       </div>
 
       <div className="mt-6 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-        {adminStats.map((stat, index) => {
+        {siteData.adminStats.map((stat, index) => {
           const Icon = index === 1 ? Users : BriefcaseBusiness;
           return (
             <section key={stat.label} className="border border-slate-200 bg-white p-5">
@@ -127,7 +174,7 @@ export function AdminPage() {
           <TrendingUp className="h-5 w-5 text-emerald-700" />
         </div>
         <div className="divide-y divide-slate-100">
-          {adminRecentExams.map((exam) => (
+          {siteData.adminRecentExams.map((exam) => (
             <div key={exam.title} className="grid gap-2 px-5 py-4 sm:grid-cols-[1fr_auto_auto] sm:items-center sm:gap-8">
               <p className="font-semibold text-[var(--ink)]">{exam.title}</p>
               <p className="text-sm text-slate-600">{exam.students} attempts</p>
@@ -136,6 +183,62 @@ export function AdminPage() {
           ))}
         </div>
       </section>
+
+      <section className="mt-8 border border-slate-200 bg-white p-5">
+        <div className="mb-4 flex items-center gap-2 text-[var(--ink)]"><PlusCircle className="h-5 w-5 text-[var(--saffron)]" /><h2 className="text-xl font-bold">Add new test</h2></div>
+        <form onSubmit={handleSubmit} className="grid gap-4 md:grid-cols-2">
+          <label className="text-sm font-medium text-slate-700">
+            Test title
+            <input
+              value={form.title}
+              onChange={(event) => setForm((current) => ({ ...current, title: event.target.value }))}
+              className="mt-1 block w-full border border-slate-300 bg-white px-3 py-2 outline-none focus:border-primary-500"
+              placeholder="Rajasthan GK Booster"
+            />
+          </label>
+
+          <label className="text-sm font-medium text-slate-700">
+            Category
+            <input
+              value={form.category}
+              onChange={(event) => setForm((current) => ({ ...current, category: event.target.value }))}
+              className="mt-1 block w-full border border-slate-300 bg-white px-3 py-2 outline-none focus:border-primary-500"
+              placeholder="RPSC"
+            />
+          </label>
+
+          <label className="text-sm font-medium text-slate-700">
+            Duration (minutes)
+            <input type="number" min={5} value={form.duration} onChange={(event) => setForm((current) => ({ ...current, duration: Number(event.target.value) || 15 }))} className="mt-1 block w-full border border-slate-300 bg-white px-3 py-2 outline-none focus:border-primary-500" />
+          </label>
+
+          <label className="text-sm font-medium text-slate-700">
+            Question count
+            <input type="number" min={1} value={form.totalQuestions} onChange={(event) => setForm((current) => ({ ...current, totalQuestions: Number(event.target.value) || 10 }))} className="mt-1 block w-full border border-slate-300 bg-white px-3 py-2 outline-none focus:border-primary-500" />
+          </label>
+
+          <label className="text-sm font-medium text-slate-700 md:col-span-2">
+            Description
+            <textarea value={form.description} onChange={(event) => setForm((current) => ({ ...current, description: event.target.value }))} className="mt-1 block min-h-24 w-full border border-slate-300 bg-white px-3 py-2 outline-none focus:border-primary-500" placeholder="Brief description of the exam" />
+          </label>
+
+          <div className="md:col-span-2 flex flex-wrap items-center justify-between gap-3">
+            <label className="text-sm font-medium text-slate-700">
+              Difficulty
+              <select value={form.difficulty} onChange={(event) => setForm((current) => ({ ...current, difficulty: event.target.value as 'Easy' | 'Medium' | 'Hard' }))} className="mt-1 block border border-slate-300 bg-white px-3 py-2 outline-none focus:border-primary-500">
+                <option value="Easy">Easy</option>
+                <option value="Medium">Medium</option>
+                <option value="Hard">Hard</option>
+              </select>
+            </label>
+
+            <button type="submit" className="inline-flex items-center gap-2 bg-primary-600 px-4 py-2 text-sm font-semibold text-white">
+              Save test <Database className="h-4 w-4" />
+            </button>
+          </div>
+        </form>
+      </section>
+
       <div className="mt-6 flex justify-end"><Link href="/exams" className="inline-flex items-center gap-2 text-sm font-semibold text-[var(--saffron)]">Browse tests <ArrowRight className="h-4 w-4" /></Link></div>
     </div>
   );

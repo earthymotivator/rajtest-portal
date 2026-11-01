@@ -1,8 +1,9 @@
 import Link from 'next/link';
 import { Activity, ArrowRight, BarChart3, CheckCircle2, Clock3 } from 'lucide-react';
-import { dashboardResults } from '@/lib/mock-data';
+import { getSiteData } from '@/lib/mock-data';
 
 export function DashboardPage() {
+  const { dashboardResults } = getSiteData();
   const averageScore = Math.round(dashboardResults.reduce((sum, result) => sum + (result.score / result.total) * 100, 0) / dashboardResults.length);
   const averagePercentile = Math.round(dashboardResults.reduce((sum, result) => sum + result.percentile, 0) / dashboardResults.length);
 
@@ -68,7 +69,7 @@ export function DashboardPage() {
         <div className="card p-6">
           <h3 className="text-xl font-bold text-slate-900">अगले अभ्यास के सुझाव</h3>
           <ul className="mt-5 space-y-4 text-sm text-slate-600">
-            <li className="flex items-center gap-3"><CheckCircle2 className="h-4 w-4 text-emerald-600" /> राजस्थान के इतिहास और दुर्गों का दोहराव करें</li>
+            <li className="flex items-center gap-3"><CheckCircle2 className="h-4 w-4 text-emerald-600" /> राजस्थान के इतिहास और दुर्गों का दौरा करें</li>
             <li className="flex items-center gap-3"><CheckCircle2 className="h-4 w-4 text-emerald-600" /> रोज़ाना 10 प्रश्नों का timed अभ्यास करें</li>
             <li className="flex items-center gap-3"><CheckCircle2 className="h-4 w-4 text-emerald-600" /> हर उत्तर की व्याख्या ज़रूर पढ़ें</li>
           </ul>

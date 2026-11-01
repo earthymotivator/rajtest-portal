@@ -16,11 +16,7 @@ import {
   Trophy,
   X,
 } from 'lucide-react';
-import {
-  homepageTestGroups,
-  homepageTests,
-  leaderboardEntries,
-} from '@/lib/mock-data';
+import { getHomepageTestGroups, getSiteData } from '@/lib/mock-data';
 
 type InstallPrompt = Event & {
   prompt: () => Promise<void>;
@@ -97,7 +93,7 @@ function formatCountdown(milliseconds: number) {
   return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
 }
 
-function HomepageTestCard({ test, index }: { test: (typeof homepageTests)[number]; index: number }) {
+function HomepageTestCard({ test, index }: { test: ReturnType<typeof getSiteData>['homepageTests'][number]; index: number }) {
   return (
     <article className="test-card">
       <div className="test-cover" data-tone={(index % 7) + 1}>
@@ -131,6 +127,7 @@ function HomepageTestCard({ test, index }: { test: (typeof homepageTests)[number
 }
 
 export function HomePage() {
+  const siteData = getSiteData();
   const [installPrompt, setInstallPrompt] = useState<InstallPrompt | null>(null);
   const [showInstall, setShowInstall] = useState(true);
   const [showTelegram, setShowTelegram] = useState(true);
@@ -170,7 +167,9 @@ export function HomePage() {
     return () => window.clearInterval(timer);
   }, []);
 
-  const availableSubjects = subjectOptions;
+  const homepageTests = siteData.homepageTests;
+  const leaderboardEntries = siteData.leaderboardEntries;
+  const homepageTestGroups = getHomepageTestGroups(siteData);
 
   const filteredGroups = useMemo(() => homepageTestGroups.map((group) => {
     const tests = Array.from(new Set(group.slugs))
@@ -179,7 +178,7 @@ export function HomePage() {
       .filter((test) => selectedExam === 'all' || test.examTags.includes(selectedExam))
       .filter((test) => selectedSubject === 'all' || (subjectAliases[test.subject] ?? [test.subject]).includes(selectedSubject));
     return { ...group, tests };
-  }).filter((group) => group.tests.length > 0), [selectedExam, selectedSubject]);
+  }).filter((group) => group.tests.length > 0), [homepageTestGroups, homepageTests, selectedExam, selectedSubject]);
 
   const dismissNotice = (key: string, close: (visible: boolean) => void) => {
     close(false);
@@ -219,7 +218,7 @@ export function HomePage() {
               <button onClick={beginInstall} className="min-h-9 bg-[#1a7f45] px-3 text-xs font-bold text-white disabled:opacity-70" disabled={!installPrompt}>
                 {installPrompt ? 'Install' : 'Open in Chrome'}
               </button>
-              <button onClick={() => dismissNotice('rajtest-install-dismissed', setShowInstall)} className="flex h-9 w-9 items-center justify-center text-[#676e7e] hover:bg-black/5" aria-label="इंस्टॉल सूचना बंद करें">
+              <button onClick={() => dismissNotice('rajtest-install-dismissed', setShowInstall)} className="flex h-9 w-9 items-center justify-center text-[#676e7e] hover:bg-black/5" aria-label="Install notice close">
                 <X className="h-4 w-4" />
               </button>
             </div>
@@ -233,7 +232,9 @@ export function HomePage() {
             <p className="min-w-0 truncate">Daily free infographic notes &amp; test updates on Telegram</p>
             <div className="flex shrink-0 items-center gap-2">
               <a href="https://t.me/rajtestofficial" target="_blank" rel="noreferrer" className="font-bold underline decoration-[#1a7f45] underline-offset-2">Join</a>
-              <button onClick={() => dismissNotice('rajtest-telegram-dismissed', setShowTelegram)} className="flex h-9 w-9 items-center justify-center hover:bg-black/5" aria-label="Telegram सूचना बंद करें"><X className="h-4 w-4" /></button>
+              <button onClick={() => dismissNotice('rajtest-telegram-dismissed', setShowTelegram)} className="flex h-9 w-9 items-center justify-center hover:bg-black/5" aria-label="Telegram close">
+                <X className="h-4 w-4" />
+              </button>
             </div>
           </div>
         </section>
@@ -246,7 +247,7 @@ export function HomePage() {
             Rajtest.in — सरकारी परीक्षा टेस्ट सीरीज़
           </h1>
           <p className="mt-3 max-w-3xl text-sm leading-6 text-[#676e7e] md:text-base">
-            Raj Test है <strong className="font-bold text-[#231300]">RPSC, CET, REET, Patwar, SSC, RRB NTPC, IBPS</strong> समेत राजस्थान की सभी भर्ती परीक्षाओं की Test Series
+            Raj Test है <strong className="font-bold text-[#231300]">RPSC, CET, REET, Patwar, SSC, RRB NTPC, IBPS</strong> समेत राजस्थान की सभी भर्ती परीक्षाओं के लिए एक उपयोगी वेबसाइट है।
           </p>
           <Link href="/exam/rajtest-pyq-12/instructions" className="mt-5 inline-flex min-h-10 items-center gap-2 bg-[#1a7f45] px-4 text-sm font-bold text-white transition hover:bg-[#14532d]">
             Start Free Test <ArrowRight className="h-4 w-4" />
@@ -267,7 +268,7 @@ export function HomePage() {
         </div>
       </section>
 
-      <section className="border-y border-[#ece9e2] bg-white py-3" aria-label="इस सप्ताह के टॉप अभ्यर्थी">
+      <section className="border-y border-[#ece9e2] bg-white py-3" aria-label="इस सप्ताह ��े टॉप अभ्यर्थी">
         <div className="container-shell mb-2 flex items-center gap-2 text-sm font-bold text-[#9a4a12]"><Flame className="h-4 w-4" /> This Week</div>
         <div className="overflow-hidden">
           <div className="rajtest-leader-track flex w-max gap-3 px-4">
@@ -302,7 +303,7 @@ export function HomePage() {
               <p className="text-[10px] text-[#676e7e]">IST · Daily</p>
             </div>
             <Link href="/exam/evening-geography-29/instructions" className="inline-flex min-h-10 items-center gap-2 bg-[#1a7f45] px-3 text-xs font-bold text-white hover:bg-[#14532d]">Free Test <ArrowRight className="h-4 w-4" /></Link>
-            <button onClick={addReminder} className="inline-flex min-h-10 items-center gap-2 border border-[#1a7f45] bg-white px-3 text-xs font-bold text-[#1a7f45] hover:bg-[#f1faf3]"><Bell className="h-4 w-4" />{reminderSet ? 'Reminded' : 'Remind'}</button>
+            <button onClick={addReminder} className="inline-flex min-h-10 items-center gap-2 border border-[#1a7f45] bg-white px-3 text-xs font-bold text-[#1a7f45] hover:bg-[#f1faf3]"><Bell className="h-4 w-4" />{reminderSet ? 'Added' : 'Remind me'}</button>
           </div>
         </div>
       </section>
@@ -310,13 +311,13 @@ export function HomePage() {
       <section id="available-tests" className="container-shell py-4 md:py-7">
         <div className="flex flex-col gap-4 border-b border-[#ece9e2] pb-4 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <p className="text-sm font-bold text-[#9a4a12]">411 tests</p>
+            <p className="text-sm font-bold text-[#9a4a12]">{homepageTests.length} tests</p>
             <h2 className="mt-1 text-2xl font-extrabold text-[#231300]">Available Tests</h2>
           </div>
           <div className="grid grid-cols-2 gap-2 sm:flex">
             <label className="relative">
               <span className="sr-only">परीक्षा से छाँटें</span>
-              <select value={selectedExam} onChange={(event) => setSelectedExam(event.target.value)} className="h-10 w-full appearance-none border border-[#d9d4ca] bg-white py-2 pl-3 pr-9 text-xs font-semibold text-[#231300] sm:w-48">
+              <select value={selectedExam} onChange={(event) => setSelectedExam(event.target.value)} className="h-10 w-full appearance-none border border-[#d9d4ca] bg-white py-2 pl-3 pr-9 text-xs font-medium text-[#231300] outline-none focus:border-[#1a7f45] sm:w-44">
                 <option value="all">All Exams</option>
                 {examOptions.map((exam) => <option key={exam} value={exam}>{exam}</option>)}
               </select>
@@ -324,9 +325,9 @@ export function HomePage() {
             </label>
             <label className="relative">
               <span className="sr-only">विषय से छाँटें</span>
-              <select value={selectedSubject} onChange={(event) => setSelectedSubject(event.target.value)} className="h-10 w-full appearance-none border border-[#d9d4ca] bg-white py-2 pl-3 pr-9 text-xs font-semibold text-[#231300] sm:w-44">
+              <select value={selectedSubject} onChange={(event) => setSelectedSubject(event.target.value)} className="h-10 w-full appearance-none border border-[#d9d4ca] bg-white py-2 pl-3 pr-9 text-xs font-medium text-[#231300] outline-none focus:border-[#1a7f45] sm:w-44">
                 <option value="all">All Subjects</option>
-                {availableSubjects.map((subject) => <option key={subject} value={subject}>{subject}</option>)}
+                {subjectOptions.map((subject) => <option key={subject} value={subject}>{subject}</option>)}
               </select>
               <ChevronDown className="pointer-events-none absolute right-3 top-3 h-4 w-4 text-[#676e7e]" />
             </label>
@@ -367,9 +368,9 @@ export function HomePage() {
 
       <section className="border-y border-[#ece9e2] bg-white py-8" aria-labelledby="tests-by-exam">
         <div className="container-shell">
-          <div className="mb-4 flex items-center justify-between gap-3"><h2 id="tests-by-exam" className="text-lg font-extrabold text-[#231300]">Tests by Exam</h2><button onClick={() => { setSelectedExam('all'); setSelectedSubject('all'); document.getElementById('available-tests')?.scrollIntoView({ behavior: 'smooth' }); }} className="text-xs font-bold text-[#1a7f45]">All Exams <ArrowRight className="inline h-3.5 w-3.5" /></button></div>
+          <div className="mb-4 flex items-center justify-between gap-3"><h2 id="tests-by-exam" className="text-lg font-extrabold text-[#231300]">Tests by Exam</h2><button onClick={() => { setSelectedExam('all'); document.getElementById('available-tests')?.scrollIntoView({ behavior: 'smooth' }); }} className="text-xs font-bold text-[#1a7f45] hover:underline">Reset</button></div>
           <div className="flex flex-wrap gap-2">
-            {examOptions.map((exam) => <button key={exam} onClick={() => { setSelectedExam(exam); document.getElementById('available-tests')?.scrollIntoView({ behavior: 'smooth' }); }} className="border border-[#ece9e2] bg-[#fffdfa] px-3 py-2 text-xs font-semibold text-[#231300] hover:border-[#bfe3c8]">{exam}</button>)}
+            {examOptions.map((exam) => <button key={exam} onClick={() => { setSelectedExam(exam); document.getElementById('available-tests')?.scrollIntoView({ behavior: 'smooth' }); }} className={`rounded-full border px-3 py-2 text-xs font-semibold ${selectedExam === exam ? 'border-[#1a7f45] bg-[#ecf9f1] text-[#14532d]' : 'border-[#ece9e2] bg-white text-[#231300]'}`}>{exam}</button>)}
           </div>
         </div>
       </section>
@@ -377,7 +378,7 @@ export function HomePage() {
       <section className="container-shell py-8" aria-labelledby="tests-by-subject">
         <h2 id="tests-by-subject" className="mb-4 text-lg font-extrabold text-[#231300]">Tests by Subject</h2>
         <div className="flex flex-wrap gap-2">
-          {availableSubjects.map((subject) => <button key={subject} onClick={() => { setSelectedSubject(subject); document.getElementById('available-tests')?.scrollIntoView({ behavior: 'smooth' }); }} className="border border-[#ece9e2] bg-white px-3 py-2 text-xs font-semibold text-[#231300] hover:border-[#bfe3c8]">{subject}</button>)}
+          {subjectOptions.map((subject) => <button key={subject} onClick={() => { setSelectedSubject(subject); document.getElementById('available-tests')?.scrollIntoView({ behavior: 'smooth' }); }} className={`rounded-full border px-3 py-2 text-xs font-semibold ${selectedSubject === subject ? 'border-[#1a7f45] bg-[#ecf9f1] text-[#14532d]' : 'border-[#ece9e2] bg-white text-[#231300]'}`}>{subject}</button>)}
         </div>
       </section>
 
@@ -391,21 +392,21 @@ export function HomePage() {
               { icon: ListFilter, title: 'Find your weak topics', text: 'See your accuracy, speed and strongest/weakest topics.', emoji: '📊' },
               { icon: Medal, title: 'Revise the questions you got wrong', text: 'Use the Wrong Notebook, bookmarks and reminders.', emoji: '🔁' },
               { icon: Trophy, title: 'Build your Booster Test', text: 'Practise the topics you are weakest in.', emoji: '🚀' },
-            ].map(({ icon: Icon, title, text, emoji }, index) => <article key={title} className="border border-[#ece9e2] bg-white p-4"><div className="flex items-center justify-between"><span className="text-xs font-extrabold text-[#9a4a12]">{index + 1}</span><span className="text-lg" aria-hidden="true">{emoji}</span></div><Icon className="mt-3 h-5 w-5 text-[#1a7f45]" /><h3 className="mt-3 text-sm font-bold text-[#231300]">{title}</h3><p className="mt-1 text-xs leading-5 text-[#676e7e]">{text}</p></article>)}
+            ].map(({ icon: Icon, title, text, emoji }, index) => <article key={title} className="border border-[#ece9e2] bg-white p-4"><div className="flex items-center justify-between"><span className="text-2xl">{emoji}</span><Icon className="h-5 w-5 text-[#1a7f45]" /></div><h3 className="mt-3 text-sm font-extrabold text-[#231300]">{title}</h3><p className="mt-2 text-xs leading-5 text-[#676e7e]">{text}</p></article>)}
           </div>
         </div>
       </section>
 
       <section id="about" className="container-shell py-9 pb-14 md:pb-9">
         <h2 className="text-xl font-extrabold text-[#231300]">About Rajtest.in — Rajasthan Government Exam Test Series</h2>
-        <p className="mt-3 max-w-5xl text-sm leading-7 text-[#676e7e]">Rajtest.in — also written Raj Test — is a free, Hindi-language mock test platform for students preparing for Rajasthan government job examinations — RPSC, CET, REET, Patwar, SSC, RRB NTPC (Railway), IBPS, Rajasthan Police, Gram Sevak and other state recruitment exams. Students take timed practice tests on their phone and get their score, rank, correct answers and topic-wise analysis immediately. Signing in with Google is optional and is used only to save a student&apos;s own test history and show their rank on the leaderboard.</p>
+        <p className="mt-3 max-w-5xl text-sm leading-7 text-[#676e7e]">Rajtest.in — also written Raj Test — is a free, Hindi-language mock test platform for students preparing for Rajasthan government recruitment and competitive exams.</p>
         <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-          <div className="border border-[#ece9e2] bg-white p-4"><CheckCircle2 className="h-5 w-5 text-[#1a7f45]" /><p className="mt-2 text-sm font-bold text-[#231300]">Start a test without signing in</p><p className="mt-1 text-xs text-[#676e7e]">Sign in with Google for rank, solutions and saved history.</p></div>
-          <div className="border border-[#ece9e2] bg-white p-4"><ListFilter className="h-5 w-5 text-[#1a7f45]" /><p className="mt-2 text-sm font-bold text-[#231300]">Weak topic analysis</p><p className="mt-1 text-xs text-[#676e7e]">Build your next booster test from the topics you get wrong.</p></div>
-          <div className="border border-[#ece9e2] bg-white p-4"><BookOpen className="h-5 w-5 text-[#1a7f45]" /><p className="mt-2 text-sm font-bold text-[#231300]">Wrong question notebook</p><p className="mt-1 text-xs text-[#676e7e]">Revisit wrong and bookmarked questions any time.</p></div>
+          <div className="border border-[#ece9e2] bg-white p-4"><CheckCircle2 className="h-5 w-5 text-[#1a7f45]" /><p className="mt-2 text-sm font-bold text-[#231300]">Start a test without signin</p><p className="mt-1 text-xs text-[#676e7e]">Fast access to practice sets</p></div>
+          <div className="border border-[#ece9e2] bg-white p-4"><ListFilter className="h-5 w-5 text-[#1a7f45]" /><p className="mt-2 text-sm font-bold text-[#231300]">Weak topic analysis</p><p className="mt-1 text-xs text-[#676e7e]">Track your performance by subject</p></div>
+          <div className="border border-[#ece9e2] bg-white p-4"><BookOpen className="h-5 w-5 text-[#1a7f45]" /><p className="mt-2 text-sm font-bold text-[#231300]">Wrong question notebook</p><p className="mt-1 text-xs text-[#676e7e]">Revision made easy</p></div>
+          <div className="border border-[#ece9e2] bg-white p-4"><Trophy className="h-5 w-5 text-[#1a7f45]" /><p className="mt-2 text-sm font-bold text-[#231300]">Leaderboards and ranks</p><p className="mt-1 text-xs text-[#676e7e]">Benchmark your progress</p></div>
         </div>
       </section>
     </div>
-
   );
 }

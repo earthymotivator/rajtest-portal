@@ -1,6 +1,7 @@
-import { examQuestions, exams, homepageTests, type Exam, type Question } from '@/lib/mock-data';
+import { getSiteData, type Exam, type Question } from '@/lib/mock-data';
 
 export function getExamBySlug(slug: string): Exam | undefined {
+  const { exams, homepageTests } = getSiteData();
   const exam = exams.find((item) => item.slug === slug || item.id === slug);
   if (exam) return exam;
 
@@ -27,6 +28,7 @@ export function getExamBySlug(slug: string): Exam | undefined {
 }
 
 export function getQuestionsForExam(slug: string): Question[] {
+  const { examQuestions, homepageTests } = getSiteData();
   return examQuestions[slug] || (homepageTests.some((test) => test.slug === slug || test.id === slug) ? examQuestions['rajtest-pyq-12'] ?? [] : []);
 }
 

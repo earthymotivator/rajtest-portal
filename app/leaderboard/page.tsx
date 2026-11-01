@@ -1,8 +1,10 @@
 import Link from 'next/link';
 import { ArrowLeft, ArrowRight, Trophy } from 'lucide-react';
-import { leaderboardEntries } from '@/lib/mock-data';
+import { getSiteData } from '@/lib/mock-data';
 
 export default function LeaderboardPage() {
+  const { leaderboardEntries } = getSiteData();
+
   return (
     <div className="container-shell py-10 md:py-14">
       <Link href="/" className="inline-flex items-center gap-2 text-sm font-semibold text-slate-600 hover:text-[var(--saffron)]">
