@@ -14,7 +14,6 @@ import {
   ListFilter,
   Medal,
   Trophy,
-  X,
 } from 'lucide-react';
 import {
   homepageTestGroups,
@@ -28,37 +27,18 @@ type InstallPrompt = Event & {
 };
 
 const examOptions = [
-  'CET (12th Based)',
-  'CET (Graduation Based)',
-  'REET',
-  '1st Grade Teacher',
-  '2nd Grade Teacher',
-  '3rd Grade Teacher',
-  'RSMSSB LDC',
-  'Patwari',
-  'Gram Sevak',
-  'Rajasthan Police',
-  'Police SI',
-  'Jail Prahari',
-  'Forest Guards',
-  'Forester',
-  'Lab Assistant',
-  'Computer Instructor',
-  'SSC CHSL',
-  'SSC CGL',
-  'IBPS',
-  'RRB Railway',
-  'Banking',
-  'RRB NTPC',
-  'RAS',
+  'CET (12th Based)', 'CET (Graduation Based)', 'REET', '1st Grade Teacher', '2nd Grade Teacher',
+  '3rd Grade Teacher', 'RSMSSB LDC', 'Patwari', 'Gram Sevak', 'Rajasthan Police', 'Police SI',
+  'Jail Prahari', 'Forest Guards', 'Forester', 'Lab Assistant', 'Computer Instructor', 'SSC CHSL',
+  'SSC CGL', 'IBPS', 'RRB Railway', 'Banking', 'RRB NTPC', 'RAS',
 ];
 
 const subjectOptions = [
   'Rajasthan GK', 'Rajasthan History', 'Rajasthan Geography', 'Rajasthan Economy',
   'Rajasthan Art & Culture', 'General Knowledge', 'History', 'Geography', 'Indian Polity',
   'Economy', 'General Studies', 'General Science', 'Maths', 'Reasoning', 'Computer',
-  'General Hindi', 'General English', 'Sanskrit', 'Current Affairs',
-  'Environmental Studies', 'Child Development & Pedagogy',
+  'General Hindi', 'General English', 'Sanskrit', 'Current Affairs', 'Environmental Studies',
+  'Child Development & Pedagogy',
 ];
 
 const subjectAliases: Record<string, string[]> = {
@@ -189,7 +169,7 @@ export function HomePage() {
   };
 
   return (
-    <div className="bg-[#fffaf4] text-[#231300]">
+    <div className="bg-[#f5efe7] text-[#231300]">
       {showInstall && (
         <section className="border-b border-[#e7c9a8] bg-[#fff5e6]" aria-label="ऐप इंस्टॉल सूचना">
           <div className="container-shell flex flex-col gap-3 py-2.5 text-sm text-[#231300] sm:flex-row sm:items-center sm:justify-between">
@@ -215,7 +195,7 @@ export function HomePage() {
       <header className="sticky top-0 z-40 border-b border-[#ece9e2] bg-white/90 backdrop-blur">
         <div className="container-shell flex min-h-[62px] items-center justify-between gap-2 sm:gap-4">
           <Link href="/" className="flex shrink-0 items-center gap-2.5" aria-label="Rajtest.in home">
-            <div className="flex h-[42px] w-[42px] items-center justify-center rounded-lg bg-[#fff3e0] text-xl shadow-sm">🧠</div>
+            <div className="flex h-[42px] w-[42px] items-center justify-center rounded-xl bg-[#fff3e0] text-xl shadow-sm">🧠</div>
             <span className="min-w-0">
               <span className="block text-[17px] font-extrabold leading-5 text-[#231300]">Rajtest.in</span>
               <span className="block text-[11px] leading-4 text-[#676e7e]">Raj Test Series</span>
@@ -246,8 +226,8 @@ export function HomePage() {
       </header>
 
       <main>
-        <section className="relative overflow-hidden bg-[radial-gradient(circle_at_top_left,_rgba(154,74,18,0.08),transparent_30%),linear-gradient(180deg,#fffaf4_0%,#fff7ef_100%)]">
-          <div className="container-shell py-8 md:py-12">
+        <section className="relative overflow-hidden rounded-b-[32px] bg-[radial-gradient(circle_at_top_left,_rgba(154,74,18,0.08),transparent_30%),linear-gradient(180deg,#fffaf4_0%,#fff7ef_100%)] shadow-[0_12px_30px_rgba(35,19,0,0.04)] md:rounded-none">
+          <div className="container-shell py-6 md:py-12">
             <div className="grid items-center gap-7 lg:grid-cols-[1.15fr_0.85fr]">
               <div>
                 <p className="text-sm font-bold text-[#9a4a12]">🇮🇳 Govt. Exam की तैयारी, अब और स्मार्ट</p>
@@ -255,7 +235,7 @@ export function HomePage() {
                   Rajtest.in — सरकारी परीक्षा टेस्ट सीरीज़
                 </h1>
                 <p className="mt-3 max-w-3xl text-sm leading-6 text-[#676e7e] md:text-base">
-                  Raj Test है <strong className="font-bold text-[#231300]">RPSC, CET, REET, Patwar, SSC, RRB NTPC, IBPS</strong> समेत राजस्थान की सभी भर्ती/सामान्य प्रतियोगिता परीक्षाओं के लिए तैयार किया गया मोबाइल-फ्रेंडली प्लेटफ़ॉर्म है।
+                  Raj Test है <strong className="font-bold text-[#231300]">RPSC, CET, REET, Patwar, SSC, RRB NTPC, IBPS</strong> समेत राजस्थान की सभी भर्ती/सामान्य प्रतियोगिता परीक्षाओं के लिए तैयार किया गया स्मार्ट मोबाइल-एप ऐप स्टाइल प्लेटफ़ॉर्म है।
                 </p>
 
                 <div className="mt-5 flex flex-col gap-3 sm:flex-row">
@@ -267,7 +247,7 @@ export function HomePage() {
                   </Link>
                 </div>
 
-                <div className="mt-6 grid max-w-2xl grid-cols-3 divide-x divide-[#eadfce] border-y border-[#eadfce] bg-white/80 backdrop-blur-sm">
+                <div className="mt-6 grid max-w-2xl grid-cols-3 divide-x divide-[#eadfce] overflow-hidden rounded-[20px] border border-[#eadfce] bg-white/80 backdrop-blur-sm shadow-sm">
                   {[
                     { value: '411', label: 'पेपर', icon: BookOpen },
                     { value: '30,531', label: 'टेस्ट दिए गए', icon: CheckCircle2 },
