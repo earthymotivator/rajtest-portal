@@ -1,4 +1,4 @@
-# rajtest-portal
+# job-gyaan-portal
 
 A competitive exam portal built with Next.js, App Router, TypeScript, Tailwind CSS, and Supabase.
 

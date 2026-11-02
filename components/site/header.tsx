@@ -12,11 +12,11 @@ export function Header() {
   return (
     <header className="sticky top-0 z-40 border-b border-[#ece9e2] bg-white">
       <div className="container-shell flex min-h-[62px] items-center justify-between gap-4">
-        <Link href="/" className="flex shrink-0 items-center gap-2.5" aria-label="Rajtest.in home">
-          <Image src="https://rajtest.in/icons/icon-192.png" alt="Rajtest.in logo" width={42} height={42} priority className="h-[42px] w-[42px] object-contain" />
+        <Link href="/" className="flex shrink-0 items-center gap-2.5" aria-label="Job Gyaan home">
+          <Image src="https://jobgyaan.in/icons/icon-192.png" alt="Job Gyaan logo" width={42} height={42} priority className="h-[42px] w-[42px] object-contain" />
           <span>
-            <span className="block text-[17px] font-extrabold leading-5 text-[#231300]">Rajtest.in</span>
-            <span className="block text-[11px] leading-4 text-[#676e7e]">Raj Test Series</span>
+            <span className="block text-[17px] font-extrabold leading-5 text-[#231300]">Job Gyaan</span>
+            <span className="block text-[11px] leading-4 text-[#676e7e]">Job Gyaan Test Series</span>
           </span>
         </Link>
 

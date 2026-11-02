@@ -5,28 +5,22 @@ import { Footer } from '@/components/site/footer';
 
 export const metadata: Metadata = {
   title: {
-    default: 'RajTest.in — Rajasthan Govt Exam Test Series in Hindi',
-    template: '%s | RajTest.in',
+    default: 'Job Gyaan — Government Exam Test Series in Hindi',
+    template: '%s | Job Gyaan',
   },
   description:
     'Free Hindi mock tests, Rajasthan GK quizzes and previous-year question papers for RPSC, CET, REET, Patwar and Rajasthan Police exams.',
   keywords: ['Rajasthan exam test series', 'RPSC', 'CET', 'REET', 'Patwar', 'Rajasthan GK', 'Hindi mock tests'],
-  metadataBase: new URL('https://rajtest.in'),
-  viewport: {
-    width: 'device-width',
-    initialScale: 1,
-    maximumScale: 1,
-    viewportFit: 'cover',
-  },
+  metadataBase: new URL('https://jobgyaan.in'),
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="hi">
-      <body className="min-h-screen bg-[#f5efe7] text-[var(--ink)] antialiased">
-        <div className="min-h-screen bg-[#f5efe7]">
+      <body className="min-h-screen bg-[var(--surface)] text-[var(--ink)] antialiased">
+        <div className="min-h-screen">
           <Header />
-          <main className="pb-24 md:pb-0">{children}</main>
+          <main>{children}</main>
           <Footer />
         </div>
       </body>

@@ -5,7 +5,7 @@ const config = {
     remotePatterns: [
       {
         protocol: 'https',
-        hostname: 'rajtest.in',
+        hostname: 'jobgyaan.in',
       },
     ],
   },
