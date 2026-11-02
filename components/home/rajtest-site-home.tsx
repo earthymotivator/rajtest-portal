@@ -192,7 +192,7 @@ export function HomePage() {
     <div className="bg-[#fffaf4] text-[#231300]">
       {showInstall && (
         <section className="border-b border-[#e7c9a8] bg-[#fff5e6]" aria-label="ऐप इंस्टॉल सूचना">
-          <div className="container-shell flex flex-wrap items-center justify-between gap-3 py-2.5 text-sm text-[#231300]">
+          <div className="container-shell flex flex-col gap-3 py-2.5 text-sm text-[#231300] sm:flex-row sm:items-center sm:justify-between">
             <div className="flex min-w-0 items-center gap-3">
               <span className="text-lg" aria-hidden="true">📱</span>
               <div className="min-w-0">
@@ -213,10 +213,10 @@ export function HomePage() {
       )}
 
       <header className="sticky top-0 z-40 border-b border-[#ece9e2] bg-white/90 backdrop-blur">
-        <div className="container-shell flex min-h-[62px] items-center justify-between gap-4">
+        <div className="container-shell flex min-h-[62px] items-center justify-between gap-2 sm:gap-4">
           <Link href="/" className="flex shrink-0 items-center gap-2.5" aria-label="Rajtest.in home">
             <div className="flex h-[42px] w-[42px] items-center justify-center rounded-lg bg-[#fff3e0] text-xl shadow-sm">🧠</div>
-            <span>
+            <span className="min-w-0">
               <span className="block text-[17px] font-extrabold leading-5 text-[#231300]">Rajtest.in</span>
               <span className="block text-[11px] leading-4 text-[#676e7e]">Raj Test Series</span>
             </span>
@@ -238,7 +238,7 @@ export function HomePage() {
               <Bell className="h-3.5 w-3.5 text-[#9a4a12]" />
               {reminderSet ? 'Reminder set' : 'Notify me'}
             </button>
-            <Link href="/exams" className="inline-flex items-center gap-2 rounded-full bg-[#1a7f45] px-4 py-2.5 text-sm font-bold text-white shadow-[0_12px_20px_rgba(26,127,69,0.22)] transition hover:bg-[#14532d]">
+            <Link href="/exams" className="inline-flex items-center justify-center gap-2 rounded-full bg-[#1a7f45] px-3 py-2.5 text-xs font-bold text-white shadow-[0_12px_20px_rgba(26,127,69,0.22)] transition sm:px-4 sm:text-sm">
               Free Test <ArrowRight className="h-4 w-4" />
             </Link>
           </div>
@@ -255,14 +255,14 @@ export function HomePage() {
                   Rajtest.in — सरकारी परीक्षा टेस्ट सीरीज़
                 </h1>
                 <p className="mt-3 max-w-3xl text-sm leading-6 text-[#676e7e] md:text-base">
-                  Raj Test है <strong className="font-bold text-[#231300]">RPSC, CET, REET, Patwar, SSC, RRB NTPC, IBPS</strong> समेत राजस्थान की सभी भर्ती परीक्षाओं के लिए एक उपयोगी वेबसाइट है।
+                  Raj Test है <strong className="font-bold text-[#231300]">RPSC, CET, REET, Patwar, SSC, RRB NTPC, IBPS</strong> समेत राजस्थान की सभी भर्ती/सामान्य प्रतियोगिता परीक्षाओं के लिए तैयार किया गया मोबाइल-फ्रेंडली प्लेटफ़ॉर्म है।
                 </p>
 
-                <div className="mt-5 flex flex-wrap items-center gap-3">
-                  <Link href="/exam/rajtest-pyq-12/instructions" className="inline-flex min-h-11 items-center gap-2 rounded-full bg-[#1a7f45] px-5 text-sm font-bold text-white transition hover:bg-[#14532d]">
+                <div className="mt-5 flex flex-col gap-3 sm:flex-row">
+                  <Link href="/exam/rajtest-pyq-12/instructions" className="inline-flex min-h-11 items-center justify-center gap-2 rounded-full bg-[#1a7f45] px-5 text-sm font-bold text-white transition hover:bg-[#14532d]">
                     Start Free Test <ArrowRight className="h-4 w-4" />
                   </Link>
-                  <Link href="#available-tests" className="inline-flex min-h-11 items-center gap-2 rounded-full border border-[#e7c9a8] bg-white px-5 text-sm font-bold text-[#231300] transition hover:border-[#d7b180]">
+                  <Link href="#available-tests" className="inline-flex min-h-11 items-center justify-center gap-2 rounded-full border border-[#e7c9a8] bg-white px-5 text-sm font-bold text-[#231300] transition hover:bg-[#fff7ef]">
                     Browse Tests <ChevronDown className="h-4 w-4" />
                   </Link>
                 </div>
@@ -288,7 +288,7 @@ export function HomePage() {
                     <div className="flex items-center justify-between gap-3">
                       <div>
                         <p className="text-[11px] font-bold uppercase tracking-[0.12em] text-orange-200">Next test live</p>
-                        <h2 className="mt-2 text-xl font-extrabold">🗺️ भूगोल · संविधान · विज्ञान</h2>
+                        <h2 className="mt-2 text-lg font-extrabold sm:text-xl">🗺️ भूगोल · संविधान · विज्ञान</h2>
                       </div>
                       <span className="rounded-full bg-white/10 px-2.5 py-1 text-[10px] font-bold uppercase">29 Oct</span>
                     </div>
@@ -353,13 +353,13 @@ export function HomePage() {
               <p className="text-sm font-bold text-[#9a4a12]">{homepageTests.length} tests</p>
               <h2 className="mt-1 text-2xl font-extrabold text-[#231300]">Available Tests</h2>
             </div>
-            <div className="grid grid-cols-2 gap-2 sm:flex">
-              <label className="relative">
+            <div className="grid w-full gap-2 sm:w-auto sm:grid-cols-2 sm:flex">
+              <label className="relative block w-full">
                 <span className="sr-only">परीक्षा से छाँटें</span>
                 <select
                   value={selectedExam}
                   onChange={(event) => setSelectedExam(event.target.value)}
-                  className="appearance-none rounded-full border border-[#ece9e2] bg-white px-3 py-2 text-xs font-semibold text-[#231300] outline-none ring-0"
+                  className="w-full appearance-none rounded-full border border-[#ece9e2] bg-white px-3 py-2 text-xs font-semibold text-[#231300] outline-none ring-0 sm:w-auto"
                 >
                   <option value="all">All Exams</option>
                   {examOptions.map((exam) => (
@@ -368,12 +368,12 @@ export function HomePage() {
                 </select>
               </label>
 
-              <label className="relative">
+              <label className="relative block w-full">
                 <span className="sr-only">विषय से छाँटें</span>
                 <select
                   value={selectedSubject}
                   onChange={(event) => setSelectedSubject(event.target.value)}
-                  className="appearance-none rounded-full border border-[#ece9e2] bg-white px-3 py-2 text-xs font-semibold text-[#231300] outline-none ring-0"
+                  className="w-full appearance-none rounded-full border border-[#ece9e2] bg-white px-3 py-2 text-xs font-semibold text-[#231300] outline-none ring-0 sm:w-auto"
                 >
                   {subjectOptions.map((subject) => (
                     <option key={subject} value={subject}>{subject}</option>
@@ -419,7 +419,7 @@ export function HomePage() {
           <div className="container-shell">
             <div className="mb-4 flex items-center justify-between gap-3">
               <h2 id="tests-by-exam" className="text-lg font-extrabold text-[#231300]">Tests by Exam</h2>
-              <button onClick={() => { setSelectedExam('all'); document.getElementById('available-tests')?.scrollIntoView({ behavior: 'smooth' }); }} className="text-xs font-bold text-[#1a7f45] hover:underline">
+              <button onClick={() => { setSelectedExam('all'); document.getElementById('available-tests')?.scrollIntoView({ behavior: 'smooth' }); }} className="text-xs font-bold text-[#1a7f45]">
                 Reset
               </button>
             </div>
@@ -431,7 +431,7 @@ export function HomePage() {
                     setSelectedExam(exam === 'all' ? 'all' : exam);
                     document.getElementById('available-tests')?.scrollIntoView({ behavior: 'smooth' });
                   }}
-                  className={`rounded-full border px-3 py-2 text-xs font-semibold ${selectedExam === exam ? 'border-[#1a7f45] bg-[#ecf9f1] text-[#14532d]' : 'border-[#ece9e2] bg-white text-[#231300]'}`}
+                  className={`rounded-full border px-3 py-2 text-xs font-semibold ${selectedExam === exam ? 'border-[#1a7f45] bg-[#ecf9f1] text-[#14532d]' : 'border-[#ece9e2] bg-white text-[#231300]'} w-full sm:w-auto`}
                 >
                   {exam === 'all' ? 'All Exams' : exam}
                 </button>
@@ -471,7 +471,7 @@ export function HomePage() {
               <p className="text-sm font-bold text-[#9a4a12]">About Rajtest.in</p>
               <h2 className="mt-2 text-2xl font-extrabold text-[#231300]">Rajasthan Government Exam Test Series</h2>
               <p className="mt-3 max-w-5xl text-sm leading-7 text-[#676e7e]">
-                Rajtest.in — also written Raj Test — is a free, Hindi-language mock test platform for students preparing for Rajasthan government recruitment and competitive exams. It helps candidates practice with exam-style questions, get topic-wise feedback, and monitor their performance through leaderboards and progress tracking.
+                Rajtest.in — also written Raj Test — is a free, Hindi-language mock test platform for students preparing for Rajasthan government recruitment and competitive exams. It helps candidates practice with realistic mock tests, track their speed and accuracy, and build confidence for high-stakes exam preparation.
               </p>
             </div>
             <div className="grid gap-3 sm:grid-cols-2">

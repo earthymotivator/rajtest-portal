@@ -12,6 +12,12 @@ export const metadata: Metadata = {
     'Free Hindi mock tests, Rajasthan GK quizzes and previous-year question papers for RPSC, CET, REET, Patwar and Rajasthan Police exams.',
   keywords: ['Rajasthan exam test series', 'RPSC', 'CET', 'REET', 'Patwar', 'Rajasthan GK', 'Hindi mock tests'],
   metadataBase: new URL('https://rajtest.in'),
+  viewport: {
+    width: 'device-width',
+    initialScale: 1,
+    maximumScale: 1,
+    viewportFit: 'cover',
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
